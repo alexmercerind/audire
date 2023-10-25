@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/identifyFragment"
+        android:icon="@drawable/baseline_graphic_eq_24"
+        android:title="@string/bottom_navigation_view_identify" />
+    <item
+        android:id="@+id/historyFragment"
+        android:icon="@drawable/baseline_history_24"
+        android:title="@string/bottom_navigation_view_history" />
+</menu>
