@@ -46,6 +46,4 @@ dependencies {
     val navVersion = "2.7.4"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
-
-    implementation("com.github.ashqal:android-libresample:0.3.0")
 }

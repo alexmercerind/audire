@@ -8,137 +8,136 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexmercerind.audire.utils.Constants
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 import kotlin.jvm.Throws
 
 class IdentifyFragmentViewModel : ViewModel() {
+    // Currently recorded duration in seconds.
+    val duration = MutableLiveData<Int>()
 
-    // Currently recorded sample duration in seconds.
-    val seconds = MutableLiveData<Int>()
-
-    // The resulting recorded audio.
+    // The recorded audio samples.
     val data = MutableLiveData<ByteArray>()
 
+    // Whether recording is under process.
     val recording
-        get() = record != null
+        get() = job != null
 
     companion object {
-        // Target duration of the audio samples to be recorded.
-        private const val DURATION = 10
+        private const val DURATION = 12
+        private const val SAMPLE_RATE = 16000
+        private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
+        private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 
-        // Target sample rate of the audio samples to be recorded.
-        // 44100 is guaranteed to work on all devices:
-        // https://developer.android.com/reference/android/media/AudioRecord#AudioRecord(int,%20int,%20int,%20int,%20int)
-        private const val SAMPLE_RATE = 44100
+        // AudioFormat.CHANNEL_IN_MONO = 1
+        // AudioFormat.CHANNEL_IN_STEREO = 2
+        private const val CHANNEL_COUNT = 1
+
+        // AudioFormat.ENCODING_PCM_8BIT = 2
+        // AudioFormat.ENCODING_PCM_16BIT = 2
+        private const val SAMPLE_WIDTH = 2
+
+        private const val BUFFER_SIZE_MULTIPLIER = 8
+
+        private val BUFFER_SIZE = AudioRecord.getMinBufferSize(
+            SAMPLE_RATE,
+            CHANNEL_CONFIG,
+            AUDIO_FORMAT
+        ) * BUFFER_SIZE_MULTIPLIER
     }
 
-    // The buffer size that may be read using AudioRecord.read.
-    private val bufferSizeInBytes = AudioRecord.getMinBufferSize(
-        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
-    )
-
-    // The AudioRecord instance.
     private var instance: AudioRecord? = null
+    private var job: Deferred<ByteArray?>? = null
 
-    // The AudioRecord job running on another coroutine, collecting samples.
-    private var record: Job? = null
-
-    // Audio samples recorded so far.
-    private var samples = mutableListOf<Byte>()
-
-    // Synchronization.
     private val lock = Any()
 
     @Throws(SecurityException::class)
     fun start() {
-        Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: start")
-
-        seconds.postValue(0)
-
-        // Create the AudioRecorder instance if not already.
-        create()
-
+        createAudioRecord()
         synchronized(lock) {
-            if (record == null) {
+            if (job == null) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    record = async {
-                        // Clear previously recorded samples.
-                        samples.clear()
-                        // Start the AudioRecord instance.
-                        instance?.startRecording()
-
-                        while (isActive) {
-                            // Currently recorded duration in seconds:
-                            // N / (R * W * C)
-                            // N = Number of samples.
-                            // R = Sample rate.
-                            // W = Sample width i.e. 2 or 16BIT.
-                            // C = Number of channels i.e. 1 or MONO.
-                            val current = samples.size / (SAMPLE_RATE * 2 * 1)
-
-                            // Notify LiveData.
-                            if (seconds.value != current) {
-                                seconds.postValue(current)
-                            }
-
-                            // COMPLETE:
-                            // The recorded duration exceeds the target.
-                            if (current >= DURATION) {
-                                data.postValue(samples.subList(0, DURATION * SAMPLE_RATE * 2 * 1).toByteArray())
-                                stop()
-                                break
-                            }
-
-                            val buffer = ByteArray(bufferSizeInBytes)
-                            instance?.read(buffer, 0, buffer.size)
-                            samples.addAll(buffer.toList())
-
-                            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: current=$current")
-                        }
-                    }
+                    Log.d(
+                        Constants.LOG_TAG,
+                        "IdentifyFragmentViewModel: AudioRecord.startRecording()"
+                    )
+                    instance?.startRecording()
+                    job = async { record() }
+                    data.postValue(job?.await())
+                    Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.stop()")
+                    instance?.stop()
+                    job = null
                 }
             }
         }
     }
 
     fun stop() {
-        Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: stop")
-
+        createAudioRecord()
         synchronized(lock) {
-            if (record != null) {
-                record?.cancel()
+            if (job != null) {
                 instance?.stop()
-                record = null
+                job?.cancel()
+                job = null
             }
         }
     }
 
+    private suspend fun record(): ByteArray? {
+        val result = mutableListOf<Byte>()
+        while (coroutineContext.isActive) {
+            // Calculate the currently recorded duration from number of samples:
+            // DURATION = NUMBER_OF_SAMPLES / (SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT)
+            val current = result.size / (SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT)
+
+            // Notify LiveData for UI updates.
+            if (duration.value != current) {
+                duration.postValue(current)
+            }
+
+            // The recorded duration exceeds the required duration... exit the polling loop.
+            if (current >= DURATION) {
+                Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: Record complete")
+                break
+            }
+
+            val buffer = ByteArray(BUFFER_SIZE)
+            instance?.read(buffer, 0, buffer.size)
+            result.addAll(buffer.toList())
+
+            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: current = $current")
+        }
+
+        return try {
+            result.subList(0, DURATION * SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT).toByteArray()
+        } catch (e: Throwable) {
+            null
+        }
+    }
+
     @Throws(SecurityException::class)
-    private fun create() {
+    private fun createAudioRecord() {
         synchronized(lock) {
             if (instance == null) {
-                // AudioRecord is used instead of MediaRecorder due to low-level access to PCM frames.
                 instance = AudioRecord(
                     AudioSource.MIC,
                     SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    bufferSizeInBytes
+                    CHANNEL_CONFIG,
+                    AUDIO_FORMAT,
+                    BUFFER_SIZE
                 )
+                Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord instantiated")
             }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-
-        Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: onCleared")
-
-        record?.cancel()
+        job?.cancel()
         instance?.apply {
             stop()
             release()

@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 
 class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
@@ -26,14 +28,12 @@ class IdentifyFragment : Fragment() {
 
     private lateinit var idleFloatingActionButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityRecordFloatingActionButtonObjectAnimator: ObjectAnimator
-
     private lateinit var visibilityStopButtonObjectAnimator: ObjectAnimator
-
     private lateinit var visibilityWaveViewObjectAnimator: ObjectAnimator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentIdentifyBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -52,20 +52,26 @@ class IdentifyFragment : Fragment() {
         }
 
         binding.stopButton.setOnClickListener {
-            // Stop the recording.
             viewModel.stop()
 
             showRecordFloatingActionButton()
         }
 
+        // https://stackoverflow.com/a/55049571/12825435
         // https://stackoverflow.com/a/70718428/12825435
-        viewModel.seconds.observe(viewLifecycleOwner) {
-            binding.stopButton.text = String.format("00:%02d", it)
+        viewModel.duration.observe(viewLifecycleOwner) {
+            binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
         viewModel.data.observe(viewLifecycleOwner) {
             showRecordFloatingActionButton()
 
-            // TODO: Handle audio data.
+            File(requireContext().getExternalFilesDir(null), "audio.pcm").apply {
+                if (exists()) {
+                    delete()
+                }
+                createNewFile()
+                writeBytes(it)
+            }
         }
 
         idleFloatingActionButtonObjectAnimator = ObjectAnimator.ofPropertyValuesHolder(
@@ -87,7 +93,6 @@ class IdentifyFragment : Fragment() {
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
         }
-
         visibilityStopButtonObjectAnimator = ObjectAnimator.ofPropertyValuesHolder(
             binding.stopButton,
             PropertyValuesHolder.ofFloat(View.SCALE_X, 0.5F, 1.0F),
@@ -97,7 +102,6 @@ class IdentifyFragment : Fragment() {
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
         }
-
         visibilityWaveViewObjectAnimator = ObjectAnimator.ofPropertyValuesHolder(
             binding.waveView,
             PropertyValuesHolder.ofFloat(View.ALPHA, 0.0F, 1.0F),
@@ -123,7 +127,6 @@ class IdentifyFragment : Fragment() {
             binding.stopButton.scaleY = 0.5F
             binding.stopButton.alpha = 0.0F
             binding.waveView.alpha = 0.0F
-            idleFloatingActionButtonObjectAnimator.start()
             idleFloatingActionButtonObjectAnimator.start()
         }
 
