@@ -1,7 +1,8 @@
 <resources>
+    <string name="about">About</string>
     <string name="app_name">Audire</string>
     <string name="bottom_navigation_view_identify">Identify</string>
     <string name="bottom_navigation_view_history">History</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="identify_record">Record</string>
+    <string name="settings">Settings</string>
 </resources>

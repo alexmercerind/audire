@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/identifyFragment"
-        android:name="com.alexmercerind.audire.IdentifyFragment"
+        android:name="com.alexmercerind.audire.ui.IdentifyFragment"
         android:label="fragment_identify"
         tools:layout="@layout/fragment_identify" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.alexmercerind.audire.HistoryFragment"
+        android:name="com.alexmercerind.audire.ui.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
         <action
