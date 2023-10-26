@@ -22,7 +22,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/identify_toolbar_menu"
-            app:title="@string/app_name" />
+            app:subtitleCentered="true"
+            app:title="@string/app_name"
+            app:titleCentered="true" />
 
         <view
             android:id="@+id/waveView"
@@ -30,13 +32,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="200dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/recordFloatingActionButton"
@@ -60,9 +60,8 @@
             android:id="@+id/stopButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            android:visibility="gone"
+            android:contentDescription="@string/identify_stop"
+            app:icon="@drawable/baseline_stop_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

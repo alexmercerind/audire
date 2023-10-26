@@ -13,11 +13,18 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.jvm.Throws
 
 class IdentifyFragmentViewModel : ViewModel() {
 
     // Currently recorded sample duration in seconds.
     val seconds = MutableLiveData<Int>()
+
+    // The resulting recorded audio.
+    val data = MutableLiveData<ByteArray>()
+
+    val recording
+        get() = record != null
 
     companion object {
         // Target duration of the audio samples to be recorded.
@@ -46,34 +53,24 @@ class IdentifyFragmentViewModel : ViewModel() {
     // Synchronization.
     private val lock = Any()
 
-    init {
-        // TODO: Create AudioRecord instance after permission grant.
-        synchronized(lock) {
-            try {
-                // AudioRecord is used instead of MediaRecorder due to low-level access to PCM frames.
-                instance = AudioRecord(
-                    AudioSource.MIC,
-                    SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    bufferSizeInBytes
-                )
-            } catch (e: SecurityException) {
-                // The Manifest.permission.RECORD_AUDIO is not available.
-                e.printStackTrace()
-            }
-        }
-    }
-
+    @Throws(SecurityException::class)
     fun start() {
         Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: start")
 
+        seconds.postValue(0)
+
+        // Create the AudioRecorder instance if not already.
+        create()
+
         synchronized(lock) {
             if (record == null) {
-                instance?.startRecording()
                 viewModelScope.launch(Dispatchers.IO) {
                     record = async {
+                        // Clear previously recorded samples.
                         samples.clear()
+                        // Start the AudioRecord instance.
+                        instance?.startRecording()
+
                         while (isActive) {
                             // Currently recorded duration in seconds:
                             // N / (R * W * C)
@@ -88,20 +85,19 @@ class IdentifyFragmentViewModel : ViewModel() {
                                 seconds.postValue(current)
                             }
 
+                            // COMPLETE:
                             // The recorded duration exceeds the target.
                             if (current >= DURATION) {
-                                samples = samples.subList(0, DURATION * SAMPLE_RATE * 2 * 1)
+                                data.postValue(samples.subList(0, DURATION * SAMPLE_RATE * 2 * 1).toByteArray())
                                 stop()
                                 break
                             }
 
-                            val data = ByteArray(bufferSizeInBytes)
-                            instance?.read(data, 0, data.size)
-                            samples.addAll(data.toList())
+                            val buffer = ByteArray(bufferSizeInBytes)
+                            instance?.read(buffer, 0, buffer.size)
+                            samples.addAll(buffer.toList())
 
-                            Log.d(
-                                Constants.LOG_TAG, "IdentifyFragmentViewModel: current=$current"
-                            )
+                            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: current=$current")
                         }
                     }
                 }
@@ -121,7 +117,25 @@ class IdentifyFragmentViewModel : ViewModel() {
         }
     }
 
+    @Throws(SecurityException::class)
+    private fun create() {
+        synchronized(lock) {
+            if (instance == null) {
+                // AudioRecord is used instead of MediaRecorder due to low-level access to PCM frames.
+                instance = AudioRecord(
+                    AudioSource.MIC,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    bufferSizeInBytes
+                )
+            }
+        }
+    }
+
     override fun onCleared() {
+        super.onCleared()
+
         Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: onCleared")
 
         record?.cancel()
@@ -129,6 +143,5 @@ class IdentifyFragmentViewModel : ViewModel() {
             stop()
             release()
         }
-        super.onCleared()
     }
 }
