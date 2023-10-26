@@ -1,9 +1,10 @@
-package com.alexmercerind.audire
+package com.alexmercerind.audire.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
