@@ -70,7 +70,7 @@ class IdentifyFragmentViewModel : ViewModel() {
                     try {
                         val result = job?.await()
                         if (result != null) {
-                            repository.identify(result)
+                            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: ${repository.identify(result)}")
                         }
                     } catch (e: Throwable) {
                         e.printStackTrace()

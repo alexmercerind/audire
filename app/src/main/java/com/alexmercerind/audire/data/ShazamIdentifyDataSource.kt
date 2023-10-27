@@ -3,6 +3,7 @@ package com.alexmercerind.audire.data
 import com.alexmercerind.audire.api.shazam.ShazamInstance
 import com.alexmercerind.audire.api.shazam.models.Geolocation
 import com.alexmercerind.audire.api.shazam.models.ShazamRequestBody
+import com.alexmercerind.audire.api.shazam.models.ShazamResponse
 import com.alexmercerind.audire.api.shazam.models.Signature
 import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.native.ShazamSignature
@@ -116,9 +117,69 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             "Dalvik/1.6.0 (Linux; U; Android 4.2.2; SM-T217S Build/JDQ39)",
             "Dalvik/1.6.0 (Linux; U; Android 4.4.4; SAMSUNG-SM-N900A Build/KTU84P)"
         )
+        val TIMEZONES = arrayOf(
+            "Europe/Amsterdam",
+            "Europe/Andorra",
+            "Europe/Astrakhan",
+            "Europe/Athens",
+            "Europe/Belgrade",
+            "Europe/Berlin",
+            "Europe/Bratislava",
+            "Europe/Brussels",
+            "Europe/Bucharest",
+            "Europe/Budapest",
+            "Europe/Busingen",
+            "Europe/Chisinau",
+            "Europe/Copenhagen",
+            "Europe/Dublin",
+            "Europe/Gibraltar",
+            "Europe/Guernsey",
+            "Europe/Helsinki",
+            "Europe/Isle_of_Man",
+            "Europe/Istanbul",
+            "Europe/Jersey",
+            "Europe/Kaliningrad",
+            "Europe/Kirov",
+            "Europe/Kyiv",
+            "Europe/Lisbon",
+            "Europe/Ljubljana",
+            "Europe/London",
+            "Europe/Luxembourg",
+            "Europe/Madrid",
+            "Europe/Malta",
+            "Europe/Mariehamn",
+            "Europe/Minsk",
+            "Europe/Monaco",
+            "Europe/Moscow",
+            "Europe/Oslo",
+            "Europe/Paris",
+            "Europe/Podgorica",
+            "Europe/Prague",
+            "Europe/Riga",
+            "Europe/Rome",
+            "Europe/Samara",
+            "Europe/San_Marino",
+            "Europe/Sarajevo",
+            "Europe/Saratov",
+            "Europe/Simferopol",
+            "Europe/Skopje",
+            "Europe/Sofia",
+            "Europe/Stockholm",
+            "Europe/Tallinn",
+            "Europe/Tirane",
+            "Europe/Ulyanovsk",
+            "Europe/Vaduz",
+            "Europe/Vatican",
+            "Europe/Vienna",
+            "Europe/Vilnius",
+            "Europe/Volgograd",
+            "Europe/Warsaw",
+            "Europe/Zagreb",
+            "Europe/Zurich"
+        )
     }
 
-    override suspend fun identify(data: ByteArray): Music {
+    override suspend fun identify(data: ByteArray): Music? {
         val timestamp = Calendar.getInstance().time.time.toInt()
         val body = ShazamRequestBody(
             Geolocation(
@@ -129,10 +190,10 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             Signature(
                 Constants.IDENTIFY_RECORD_DURATION * 1000,
                 timestamp,
-                ShazamSignature().create(convert(data))
+                ShazamSignature().create(convertByteArrayToShortArray(data))
             ),
             timestamp,
-            "Europe/Amsterdam"
+            TIMEZONES.random()
         )
         val name = Random(timestamp).nextInt(1 shl 48).toString()
         val response = ShazamInstance.api.discovery(
@@ -141,15 +202,41 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_URL, name).toString(),
             USER_AGENTS.random(),
         )
-        // TODO: Extract Music from ShazamResponse.
-        return Music()
+
+        return if (response.isSuccessful) convertShazamResponseToMusic(response.body()) else null
     }
 
-    private fun convert(data: ByteArray): ShortArray {
+    private fun convertByteArrayToShortArray(data: ByteArray): ShortArray {
         val result = ShortArray(data.size / 2)
         for (i in 0..result.size step 2) {
             result[i / 2] = (data[i].toInt() and 0xFF or (data[i + 1].toInt() shl 8)).toShort()
         }
         return result
     }
+
+    private fun convertShazamResponseToMusic(response: ShazamResponse?) = Music(
+        null,
+        response?.track?.title!!,
+        response?.track?.subtitle!!,
+        response?.track?.images?.coverarthq!!,
+        response?.track?.sections
+            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
+            ?.metadata
+            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "ALBUM" }
+            ?.text,
+        response?.track?.sections
+            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
+            ?.metadata
+            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "LABEL" }
+            ?.text,
+        response?.track?.sections
+            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
+            ?.metadata
+            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "RELEASED" }
+            ?.text,
+        response?.track?.sections
+            ?.firstOrNull { section -> section.type?.uppercase() == "LYRICS" }
+            ?.text
+            ?.joinToString("\n")
+    )
 }
