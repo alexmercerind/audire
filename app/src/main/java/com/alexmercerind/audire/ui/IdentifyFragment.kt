@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -55,11 +56,27 @@ class IdentifyFragment : Fragment() {
         viewModel.duration.observe(viewLifecycleOwner) {
             binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
-        viewModel.recording.observe(viewLifecycleOwner) {
-            if (it) {
-                animateToStopButton()
-            } else {
-                animateToRecordButton()
+        viewModel.state.observe(viewLifecycleOwner) {
+            Log.d(Constants.LOG_TAG, "IdentifyFragment: IdentifyState=$it")
+            when (it) {
+                IdentifyState.IDLE -> animateToRecordButton()
+                IdentifyState.RECORD -> animateToStopButton()
+                IdentifyState.REQUEST -> {
+                    // TODO:
+                }
+
+                IdentifyState.SUCCESS -> animateToRecordButton()
+                IdentifyState.ERROR -> {
+                    animateToRecordButton()
+                    Toast
+                        .makeText(requireContext(), R.string.identify_error, Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+        }
+        viewModel.music.observe(viewLifecycleOwner) {
+            if (viewModel.state.value == IdentifyState.SUCCESS) {
+                Log.d(Constants.LOG_TAG, "IdentifyFragment: music=$it")
             }
         }
 
@@ -99,16 +116,7 @@ class IdentifyFragment : Fragment() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        if (viewModel.recording.value == true) {
-            binding.recordFloatingActionButton.scaleX = 0.5F
-            binding.recordFloatingActionButton.scaleY = 0.5F
-            binding.recordFloatingActionButton.alpha = 0.0F
-            binding.stopButton.scaleX = 1.0F
-            binding.stopButton.scaleY = 1.0F
-            binding.stopButton.alpha = 1.0F
-            binding.waveView.alpha = 1.0F
-            idleFloatingActionButtonObjectAnimator.cancel()
-        } else {
+        if (viewModel.state.value == IdentifyState.IDLE) {
             binding.recordFloatingActionButton.scaleX = 1.0F
             binding.recordFloatingActionButton.scaleY = 1.0F
             binding.recordFloatingActionButton.alpha = 1.0F
@@ -117,6 +125,16 @@ class IdentifyFragment : Fragment() {
             binding.stopButton.alpha = 0.0F
             binding.waveView.alpha = 0.0F
             idleFloatingActionButtonObjectAnimator.start()
+        }
+        if (viewModel.state.value == IdentifyState.RECORD) {
+            binding.recordFloatingActionButton.scaleX = 0.5F
+            binding.recordFloatingActionButton.scaleY = 0.5F
+            binding.recordFloatingActionButton.alpha = 0.0F
+            binding.stopButton.scaleX = 1.0F
+            binding.stopButton.scaleY = 1.0F
+            binding.stopButton.alpha = 1.0F
+            binding.waveView.alpha = 1.0F
+            idleFloatingActionButtonObjectAnimator.cancel()
         }
 
         return view

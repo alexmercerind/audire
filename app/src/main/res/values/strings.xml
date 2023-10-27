@@ -3,6 +3,7 @@
     <string name="app_name">Audire</string>
     <string name="bottom_navigation_view_identify">Identify</string>
     <string name="bottom_navigation_view_history">History</string>
+    <string name="identify_error">Could not identify. Retry?</string>
     <string name="identify_record">Record</string>
     <string name="identify_stop">Stop</string>
     <string name="identify_record_permission_not_available_title">Insufficient permissions</string>

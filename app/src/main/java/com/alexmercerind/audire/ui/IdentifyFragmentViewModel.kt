@@ -8,8 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexmercerind.audire.data.ShazamIdentifyDataSource
+import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.repository.IdentifyRepository
 import com.alexmercerind.audire.utils.Constants
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -17,13 +19,23 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 
+enum class IdentifyState {
+    IDLE,
+    RECORD,
+    REQUEST,
+    SUCCESS,
+    ERROR
+}
 
 class IdentifyFragmentViewModel : ViewModel() {
-    // Currently recorded duration in seconds.
+    // PUBLIC: Currently recorded duration in seconds.
     val duration = MutableLiveData<Int>(0)
 
-    // Whether recording is under process.
-    val recording = MutableLiveData<Boolean>(false)
+    // PUBLIC: Identified music.
+    val music = MutableLiveData<Music?>(null)
+
+    // PUBLIC: Current state of the fragment.
+    val state = MutableLiveData<IdentifyState>(IdentifyState.IDLE)
 
     companion object {
         private const val SAMPLE_RATE = 16000
@@ -62,24 +74,36 @@ class IdentifyFragmentViewModel : ViewModel() {
                         Constants.LOG_TAG,
                         "IdentifyFragmentViewModel: AudioRecord.startRecording()"
                     )
-                    instance?.startRecording()
 
-                    recording.postValue(true)
+                    instance?.startRecording()
 
                     job = async { record() }
                     try {
-                        val result = job?.await()
-                        if (result != null) {
-                            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: ${repository.identify(result)}")
-                        }
+
+                        state.postValue(IdentifyState.RECORD)
+
+                        val data = job?.await()
+
+                        state.postValue(IdentifyState.REQUEST)
+
+                        val result = repository.identify(data!!)
+
+                        state.postValue(IdentifyState.SUCCESS)
+
+                        music.postValue(result)
+                    } catch (e: CancellationException) {
+                        e.printStackTrace()
+                        // N/A
                     } catch (e: Throwable) {
                         e.printStackTrace()
+
+                        state.postValue(IdentifyState.ERROR)
                     }
+
                     Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.stop()")
+
                     instance?.stop()
                     job = null
-
-                    recording.postValue(false)
                 }
             }
         }
@@ -89,12 +113,14 @@ class IdentifyFragmentViewModel : ViewModel() {
         createAudioRecord()
         synchronized(lock) {
             if (job != null) {
+                Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.stop()")
+
                 instance?.stop()
                 job?.cancel()
                 job = null
-
-                recording.postValue(false)
             }
+
+            state.postValue(IdentifyState.IDLE)
         }
     }
 
