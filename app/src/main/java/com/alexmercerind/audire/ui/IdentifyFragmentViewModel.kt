@@ -14,18 +14,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
-import kotlin.jvm.Throws
+
 
 class IdentifyFragmentViewModel : ViewModel() {
     // Currently recorded duration in seconds.
-    val duration = MutableLiveData<Int>()
-
-    // The recorded audio samples.
-    val data = MutableLiveData<ByteArray>()
+    val duration = MutableLiveData<Int>(0)
 
     // Whether recording is under process.
-    val recording
-        get() = job != null
+    val recording = MutableLiveData<Boolean>(false)
 
     companion object {
         private const val DURATION = 12
@@ -44,9 +40,7 @@ class IdentifyFragmentViewModel : ViewModel() {
         private const val BUFFER_SIZE_MULTIPLIER = 8
 
         private val BUFFER_SIZE = AudioRecord.getMinBufferSize(
-            SAMPLE_RATE,
-            CHANNEL_CONFIG,
-            AUDIO_FORMAT
+            SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT
         ) * BUFFER_SIZE_MULTIPLIER
     }
 
@@ -61,16 +55,25 @@ class IdentifyFragmentViewModel : ViewModel() {
         synchronized(lock) {
             if (job == null) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    Log.d(
-                        Constants.LOG_TAG,
-                        "IdentifyFragmentViewModel: AudioRecord.startRecording()"
-                    )
+                    Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.startRecording()")
                     instance?.startRecording()
+
+                    recording.postValue(true)
+
                     job = async { record() }
-                    data.postValue(job?.await())
+                    try {
+                        val result = job?.await()
+                        if (result != null) {
+                            // TODO: Handle result.
+                        }
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                    }
                     Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.stop()")
                     instance?.stop()
                     job = null
+
+                    recording.postValue(false)
                 }
             }
         }
@@ -83,6 +86,8 @@ class IdentifyFragmentViewModel : ViewModel() {
                 instance?.stop()
                 job?.cancel()
                 job = null
+
+                recording.postValue(false)
             }
         }
     }
@@ -119,18 +124,22 @@ class IdentifyFragmentViewModel : ViewModel() {
         }
     }
 
+    private fun convertByteArrayToShortArray(data: ByteArray): ShortArray {
+        val result = ShortArray(data.size / 2)
+        for (i in 0..result.size step 2) {
+            result[i / 2] = (data[i].toInt() and 0xFF or (data[i + 1].toInt() shl 8)).toShort()
+        }
+        return result
+    }
+
     @Throws(SecurityException::class)
     private fun createAudioRecord() {
         synchronized(lock) {
             if (instance == null) {
                 instance = AudioRecord(
-                    AudioSource.MIC,
-                    SAMPLE_RATE,
-                    CHANNEL_CONFIG,
-                    AUDIO_FORMAT,
-                    BUFFER_SIZE
+                    AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE
                 )
-                Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord instantiated")
+                Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord")
             }
         }
     }

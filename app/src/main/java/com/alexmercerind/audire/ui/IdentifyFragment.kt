@@ -18,7 +18,6 @@ import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.File
 
 class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
@@ -40,21 +39,15 @@ class IdentifyFragment : Fragment() {
         binding.recordFloatingActionButton.setOnClickListener {
             // Request Manifest.permission.RECORD_AUDIO.
             requestRecordAudioPermission()
-
             if (checkRecordAudioPermission()) {
                 viewModel.start()
-
-                hideRecordFloatingActionButton()
             } else {
                 // Manifest.permission.RECORD_AUDIO is not available.
                 showRecordAudioPermissionNotAvailableDialog()
             }
         }
-
         binding.stopButton.setOnClickListener {
             viewModel.stop()
-
-            showRecordFloatingActionButton()
         }
 
         // https://stackoverflow.com/a/55049571/12825435
@@ -62,15 +55,11 @@ class IdentifyFragment : Fragment() {
         viewModel.duration.observe(viewLifecycleOwner) {
             binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
-        viewModel.data.observe(viewLifecycleOwner) {
-            showRecordFloatingActionButton()
-
-            File(requireContext().getExternalFilesDir(null), "audio.pcm").apply {
-                if (exists()) {
-                    delete()
-                }
-                createNewFile()
-                writeBytes(it)
+        viewModel.recording.observe(viewLifecycleOwner) {
+            if (it) {
+                animateToStopButton()
+            } else {
+                animateToRecordButton()
             }
         }
 
@@ -110,7 +99,7 @@ class IdentifyFragment : Fragment() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        if (viewModel.recording) {
+        if (viewModel.recording.value == true) {
             binding.recordFloatingActionButton.scaleX = 0.5F
             binding.recordFloatingActionButton.scaleY = 0.5F
             binding.recordFloatingActionButton.alpha = 0.0F
@@ -133,18 +122,32 @@ class IdentifyFragment : Fragment() {
         return view
     }
 
-    private fun showRecordFloatingActionButton() {
+    private fun animateToRecordButton() {
         idleFloatingActionButtonObjectAnimator.start()
-        visibilityRecordFloatingActionButtonObjectAnimator.start()
-        visibilityStopButtonObjectAnimator.reverse()
-        visibilityWaveViewObjectAnimator.reverse()
+
+        if (binding.recordFloatingActionButton.alpha == 0.0F) {
+            visibilityRecordFloatingActionButtonObjectAnimator.start()
+        }
+        if (binding.stopButton.alpha == 1.0F) {
+            visibilityStopButtonObjectAnimator.reverse()
+        }
+        if (binding.waveView.alpha == 1.0F) {
+            visibilityWaveViewObjectAnimator.reverse()
+        }
     }
 
-    private fun hideRecordFloatingActionButton() {
+    private fun animateToStopButton() {
         idleFloatingActionButtonObjectAnimator.cancel()
-        visibilityRecordFloatingActionButtonObjectAnimator.reverse()
-        visibilityStopButtonObjectAnimator.start()
-        visibilityWaveViewObjectAnimator.start()
+
+        if (binding.recordFloatingActionButton.alpha == 1.0F) {
+            visibilityRecordFloatingActionButtonObjectAnimator.reverse()
+        }
+        if (binding.stopButton.alpha == 0.0F) {
+            visibilityStopButtonObjectAnimator.start()
+        }
+        if (binding.waveView.alpha == 0.0F) {
+            visibilityWaveViewObjectAnimator.start()
+        }
     }
 
     private fun requestRecordAudioPermission() {
