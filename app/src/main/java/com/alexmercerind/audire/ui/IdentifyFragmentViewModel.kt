@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alexmercerind.audire.data.ShazamIdentifyDataSource
+import com.alexmercerind.audire.repository.IdentifyRepository
 import com.alexmercerind.audire.utils.Constants
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,6 @@ class IdentifyFragmentViewModel : ViewModel() {
     val recording = MutableLiveData<Boolean>(false)
 
     companion object {
-        private const val DURATION = 12
         private const val SAMPLE_RATE = 16000
         private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
         private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
@@ -49,13 +50,18 @@ class IdentifyFragmentViewModel : ViewModel() {
 
     private val lock = Any()
 
+    private val repository = IdentifyRepository(ShazamIdentifyDataSource())
+
     @Throws(SecurityException::class)
     fun start() {
         createAudioRecord()
         synchronized(lock) {
             if (job == null) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.startRecording()")
+                    Log.d(
+                        Constants.LOG_TAG,
+                        "IdentifyFragmentViewModel: AudioRecord.startRecording()"
+                    )
                     instance?.startRecording()
 
                     recording.postValue(true)
@@ -64,7 +70,7 @@ class IdentifyFragmentViewModel : ViewModel() {
                     try {
                         val result = job?.await()
                         if (result != null) {
-                            // TODO: Handle result.
+                            repository.identify(result)
                         }
                     } catch (e: Throwable) {
                         e.printStackTrace()
@@ -105,7 +111,7 @@ class IdentifyFragmentViewModel : ViewModel() {
             }
 
             // The recorded duration exceeds the required duration... exit the polling loop.
-            if (current >= DURATION) {
+            if (current >= Constants.IDENTIFY_RECORD_DURATION) {
                 Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: Record complete")
                 break
             }
@@ -118,18 +124,13 @@ class IdentifyFragmentViewModel : ViewModel() {
         }
 
         return try {
-            result.subList(0, DURATION * SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT).toByteArray()
+            result.subList(
+                0,
+                Constants.IDENTIFY_RECORD_DURATION * SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT
+            ).toByteArray()
         } catch (e: Throwable) {
             null
         }
-    }
-
-    private fun convertByteArrayToShortArray(data: ByteArray): ShortArray {
-        val result = ShortArray(data.size / 2)
-        for (i in 0..result.size step 2) {
-            result[i / 2] = (data[i].toInt() and 0xFF or (data[i + 1].toInt() shl 8)).toShort()
-        }
-        return result
     }
 
     @Throws(SecurityException::class)
