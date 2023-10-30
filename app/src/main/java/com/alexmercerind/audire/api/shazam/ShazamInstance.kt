@@ -1,6 +1,5 @@
 package com.alexmercerind.audire.api.shazam
 
-import com.alexmercerind.audire.utils.Constants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

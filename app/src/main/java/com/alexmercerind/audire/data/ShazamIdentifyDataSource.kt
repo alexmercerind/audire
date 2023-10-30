@@ -183,9 +183,9 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
         val timestamp = Calendar.getInstance().time.time.toInt()
         val body = ShazamRequestBody(
             Geolocation(
-                Random(timestamp).nextDouble(),
-                Random(timestamp).nextDouble(),
-                Random(timestamp).nextDouble()
+                Random(timestamp).nextDouble() * 400 + 100,
+                Random(timestamp).nextDouble() * 180 - 90,
+                Random(timestamp).nextDouble() * 360 - 180
             ),
             Signature(
                 Constants.IDENTIFY_RECORD_DURATION * 1000,

@@ -4,6 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder.AudioSource
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,27 +16,27 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 
-enum class IdentifyState {
-    IDLE,
-    RECORD,
-    REQUEST,
-    SUCCESS,
-    ERROR
-}
 
 class IdentifyFragmentViewModel : ViewModel() {
-    // PUBLIC: Currently recorded duration in seconds.
-    val duration = MutableLiveData<Int>(0)
+    val idle
+        get() = _idle as LiveData<Boolean>
+    val duration
+        get() = _duration as LiveData<Int>
+    val music
+        get() = _music.asSharedFlow()
+    val error
+        get() = _error.asSharedFlow()
 
-    // PUBLIC: Identified music.
-    val music = MutableLiveData<Music?>(null)
-
-    // PUBLIC: Current state of the fragment.
-    val state = MutableLiveData<IdentifyState>(IdentifyState.IDLE)
+    private val _idle = MutableLiveData(true)
+    private val _duration = MutableLiveData(0)
+    private val _music = MutableSharedFlow<Music>()
+    private val _error = MutableSharedFlow<String>()
 
     companion object {
         private const val SAMPLE_RATE = 16000
@@ -68,42 +69,29 @@ class IdentifyFragmentViewModel : ViewModel() {
     fun start() {
         createAudioRecord()
         synchronized(lock) {
+            if (_idle.value != false) {
+                _idle.postValue(false)
+            }
+
             if (job == null) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    Log.d(
-                        Constants.LOG_TAG,
-                        "IdentifyFragmentViewModel: AudioRecord.startRecording()"
-                    )
+                    Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.startRecording()")
 
                     instance?.startRecording()
 
                     job = async { record() }
                     try {
-
-                        state.postValue(IdentifyState.RECORD)
-
                         val data = job?.await()
-
-                        state.postValue(IdentifyState.REQUEST)
-
                         val result = repository.identify(data!!)
-
-                        state.postValue(IdentifyState.SUCCESS)
-
-                        music.postValue(result)
+                        _music.emit(result!!)
                     } catch (e: CancellationException) {
                         e.printStackTrace()
-                        // N/A
                     } catch (e: Throwable) {
                         e.printStackTrace()
-
-                        state.postValue(IdentifyState.ERROR)
+                        _error.emit(e.stackTraceToString())
                     }
 
-                    Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.stop()")
-
-                    instance?.stop()
-                    job = null
+                    stop()
                 }
             }
         }
@@ -120,7 +108,9 @@ class IdentifyFragmentViewModel : ViewModel() {
                 job = null
             }
 
-            state.postValue(IdentifyState.IDLE)
+            if (_idle.value != true) {
+                _idle.postValue(true)
+            }
         }
     }
 
@@ -132,8 +122,8 @@ class IdentifyFragmentViewModel : ViewModel() {
             val current = result.size / (SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT)
 
             // Notify LiveData for UI updates.
-            if (duration.value != current) {
-                duration.postValue(current)
+            if (_duration.value != current) {
+                _duration.postValue(current)
             }
 
             // The recorded duration exceeds the required duration... exit the polling loop.

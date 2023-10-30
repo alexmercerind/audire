@@ -43,6 +43,7 @@ class WaveView @JvmOverloads constructor(
         paint.color = MaterialColors.getColor(
             context, com.google.android.material.R.attr.colorSurfaceVariant, Color.BLACK
         )
+
         path.moveTo(0f, height.toFloat())
         path.lineTo(0f, amplitude)
         for (i in 0..width step 10) {

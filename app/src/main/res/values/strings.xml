@@ -4,10 +4,12 @@
     <string name="bottom_navigation_view_identify">Identify</string>
     <string name="bottom_navigation_view_history">History</string>
     <string name="identify_error">Could not identify. Retry?</string>
+    <string name="identify_error_details">Details</string>
+    <string name="identify_error_alert_dialog_title">:(</string>
     <string name="identify_record">Record</string>
     <string name="identify_stop">Stop</string>
-    <string name="identify_record_permission_not_available_title">Insufficient permissions</string>
-    <string name="identify_record_permission_not_available_message">The application cannot access your microphone to record the audio. Provide access to android.permission.RECORD_AUDIO permission.</string>
+    <string name="identify_record_permission_alert_dialog_not_available_title">Insufficient permissions</string>
+    <string name="identify_record_permission_alert_dialog_not_available_message">The application cannot access your microphone to record the audio. Provide access to android.permission.RECORD_AUDIO permission.</string>
     <string name="ok">OK</string>
     <string name="settings">Settings</string>
 </resources>

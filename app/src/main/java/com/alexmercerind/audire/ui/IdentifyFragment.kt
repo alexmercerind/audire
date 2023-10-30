@@ -11,14 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
@@ -36,7 +38,6 @@ class IdentifyFragment : Fragment() {
     ): View {
         _binding = FragmentIdentifyBinding.inflate(inflater, container, false)
         val view = binding.root
-
         binding.recordFloatingActionButton.setOnClickListener {
             // Request Manifest.permission.RECORD_AUDIO.
             requestRecordAudioPermission()
@@ -53,30 +54,36 @@ class IdentifyFragment : Fragment() {
 
         // https://stackoverflow.com/a/55049571/12825435
         // https://stackoverflow.com/a/70718428/12825435
+        viewModel.idle.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> animateToRecordButton()
+                false -> animateToStopButton()
+            }
+        }
         viewModel.duration.observe(viewLifecycleOwner) {
             binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
-        viewModel.state.observe(viewLifecycleOwner) {
-            Log.d(Constants.LOG_TAG, "IdentifyFragment: IdentifyState=$it")
-            when (it) {
-                IdentifyState.IDLE -> animateToRecordButton()
-                IdentifyState.RECORD -> animateToStopButton()
-                IdentifyState.REQUEST -> {
-                    // TODO:
-                }
 
-                IdentifyState.SUCCESS -> animateToRecordButton()
-                IdentifyState.ERROR -> {
-                    animateToRecordButton()
-                    Toast
-                        .makeText(requireContext(), R.string.identify_error, Toast.LENGTH_LONG)
-                        .show()
-                }
+        lifecycleScope.launch {
+            viewModel.music.collect {
+                Log.d(Constants.LOG_TAG, it.toString())
+                // TODO:
             }
         }
-        viewModel.music.observe(viewLifecycleOwner) {
-            if (viewModel.state.value == IdentifyState.SUCCESS) {
-                Log.d(Constants.LOG_TAG, "IdentifyFragment: music=$it")
+        lifecycleScope.launch {
+            viewModel.error.collect {
+                Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
+//                    setAction(R.string.identify_error_details) {
+//                        MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
+//                            .setTitle(R.string.identify_error)
+//                            .setMessage(error)
+//                            .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
+//                            .create()
+//                            .show()
+//                    }
+                    anchorView = requireActivity().findViewById(R.id.bottomNavigationView)
+                    show()
+                }
             }
         }
 
@@ -116,7 +123,7 @@ class IdentifyFragment : Fragment() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        if (viewModel.state.value == IdentifyState.IDLE) {
+        if (viewModel.idle.value == true) {
             binding.recordFloatingActionButton.scaleX = 1.0F
             binding.recordFloatingActionButton.scaleY = 1.0F
             binding.recordFloatingActionButton.alpha = 1.0F
@@ -125,8 +132,7 @@ class IdentifyFragment : Fragment() {
             binding.stopButton.alpha = 0.0F
             binding.waveView.alpha = 0.0F
             idleFloatingActionButtonObjectAnimator.start()
-        }
-        if (viewModel.state.value == IdentifyState.RECORD) {
+        } else {
             binding.recordFloatingActionButton.scaleX = 0.5F
             binding.recordFloatingActionButton.scaleY = 0.5F
             binding.recordFloatingActionButton.alpha = 0.0F
@@ -181,13 +187,12 @@ class IdentifyFragment : Fragment() {
     }
 
     private fun showRecordAudioPermissionNotAvailableDialog() {
-        MaterialAlertDialogBuilder(
-            requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog
-        ).setTitle(R.string.identify_record_permission_not_available_title)
-            .setMessage(R.string.identify_record_permission_not_available_message)
-            .setPositiveButton(
-                R.string.ok
-            ) { dialog, _ -> dialog?.dismiss() }.create().show()
+        MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
+            .setTitle(R.string.identify_record_permission_alert_dialog_not_available_title)
+            .setMessage(R.string.identify_record_permission_alert_dialog_not_available_message)
+            .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
+            .create()
+            .show()
 
     }
 
