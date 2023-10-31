@@ -54,4 +54,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     implementation("com.github.f4b6a3:uuid-creator:5.3.3")
+
+    implementation("io.coil-kt:coil:2.4.0")
 }

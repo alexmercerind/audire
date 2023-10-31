@@ -3,6 +3,7 @@ package com.alexmercerind.audire.ui
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -17,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
+import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -66,8 +68,11 @@ class IdentifyFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.music.collect {
-                Log.d(Constants.LOG_TAG, it.toString())
-                // TODO:
+                // Show the MusicActivity.
+                val intent = Intent(context, MusicActivity::class.java).apply {
+                    putExtra(MusicActivity.MUSIC, it)
+                }
+                startActivity(intent)
             }
         }
         lifecycleScope.launch {
