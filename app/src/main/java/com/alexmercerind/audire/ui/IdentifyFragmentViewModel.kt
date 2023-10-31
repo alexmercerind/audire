@@ -20,16 +20,33 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.coroutineContext
 
 
 class IdentifyFragmentViewModel : ViewModel() {
+    /**
+     * Whether the view is in idle state i.e. not recording.
+     */
     val idle
         get() = _idle as LiveData<Boolean>
+
+    /**
+     * Duration recorded so far (in seconds).
+     */
     val duration
         get() = _duration as LiveData<Int>
+
+    /**
+     * Identified music.
+     */
     val music
         get() = _music.asSharedFlow()
+
+    /**
+     * Error received.
+     */
     val error
         get() = _error.asSharedFlow()
 
@@ -37,6 +54,9 @@ class IdentifyFragmentViewModel : ViewModel() {
     private val _duration = MutableLiveData(0)
     private val _music = MutableSharedFlow<Music>()
     private val _error = MutableSharedFlow<String>()
+
+    private var _identifyMusic: Music? = null
+    private var _identifyDuration: Int? = null
 
     companion object {
         private const val SAMPLE_RATE = 16000
@@ -62,6 +82,7 @@ class IdentifyFragmentViewModel : ViewModel() {
     private var job: Deferred<ByteArray?>? = null
 
     private val lock = Any()
+    private val mutex = Mutex()
 
     private val repository = IdentifyRepository(ShazamIdentifyDataSource())
 
@@ -73,6 +94,8 @@ class IdentifyFragmentViewModel : ViewModel() {
                 _idle.postValue(false)
             }
 
+            _identifyMusic = null
+
             if (job == null) {
                 viewModelScope.launch(Dispatchers.IO) {
                     Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord.startRecording()")
@@ -82,8 +105,16 @@ class IdentifyFragmentViewModel : ViewModel() {
                     job = async { record() }
                     try {
                         val data = job?.await()
-                        val result = repository.identify(data!!)
-                        _music.emit(result!!)
+
+                        Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: repository.identify=${Constants.IDENTIFY_RECORD_DURATION_MAXIMUM}")
+
+                        mutex.withLock {
+                            val music = repository.identify(data!!, Constants.IDENTIFY_RECORD_DURATION_MAXIMUM)
+                            if (_identifyMusic != music) {
+                                _music.emit(music!!)
+                                _identifyMusic = music
+                            }
+                        }
                     } catch (e: CancellationException) {
                         e.printStackTrace()
                     } catch (e: Throwable) {
@@ -127,7 +158,7 @@ class IdentifyFragmentViewModel : ViewModel() {
             }
 
             // The recorded duration exceeds the required duration... exit the polling loop.
-            if (current >= Constants.IDENTIFY_RECORD_DURATION) {
+            if (current >= Constants.IDENTIFY_RECORD_DURATION_MAXIMUM) {
                 Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: Record complete")
                 break
             }
@@ -136,13 +167,40 @@ class IdentifyFragmentViewModel : ViewModel() {
             instance?.read(buffer, 0, buffer.size)
             result.addAll(buffer.toList())
 
+            // Attempt to identify partial samples.
+            if (current > Constants.IDENTIFY_RECORD_DURATION_MINIMUM && _identifyDuration != current) {
+                _identifyDuration = current
+
+                viewModelScope.launch {
+                    mutex.withLock {
+                        try {
+                            Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: repository.identify=${result.size}")
+
+                            val music = repository.identify(result.toByteArray(), current)
+
+                            // NOTE: Only allow "well known" music (with album available in it) in partial samples.
+                            if (music?.album != null) {
+                                if (_identifyMusic != music) {
+                                    _music.emit(music!!)
+                                    _identifyMusic = music
+                                }
+                            }
+
+                            stop()
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+
             Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: current = $current")
         }
 
         return try {
             result.subList(
                 0,
-                Constants.IDENTIFY_RECORD_DURATION * SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT
+                Constants.IDENTIFY_RECORD_DURATION_MAXIMUM * SAMPLE_RATE * SAMPLE_WIDTH * CHANNEL_COUNT
             ).toByteArray()
         } catch (e: Throwable) {
             null
@@ -156,6 +214,7 @@ class IdentifyFragmentViewModel : ViewModel() {
                 instance = AudioRecord(
                     AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE
                 )
+
                 Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord")
             }
         }

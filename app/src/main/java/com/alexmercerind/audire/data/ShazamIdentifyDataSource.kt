@@ -7,7 +7,6 @@ import com.alexmercerind.audire.api.shazam.models.ShazamResponse
 import com.alexmercerind.audire.api.shazam.models.Signature
 import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.native.ShazamSignature
-import com.alexmercerind.audire.utils.Constants
 import com.github.f4b6a3.uuid.UuidCreator
 import com.github.f4b6a3.uuid.enums.UuidNamespace
 import java.util.Calendar
@@ -179,7 +178,7 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
         )
     }
 
-    override suspend fun identify(data: ByteArray): Music? {
+    override suspend fun identify(data: ByteArray, duration: Int): Music? {
         val timestamp = Calendar.getInstance().time.time.toInt()
         val body = ShazamRequestBody(
             Geolocation(
@@ -188,7 +187,7 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
                 Random(timestamp).nextDouble() * 360 - 180
             ),
             Signature(
-                Constants.IDENTIFY_RECORD_DURATION * 1000,
+                duration * 1000,
                 timestamp,
                 ShazamSignature().create(convertByteArrayToShortArray(data))
             ),

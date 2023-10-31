@@ -118,6 +118,7 @@
                 android:id="@+id/yearChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 app:chipBackgroundColor="?attr/colorPrimaryContainer"
                 app:chipIcon="@drawable/baseline_calendar_today_24"
                 app:chipIconTint="?attr/colorOnPrimaryContainer"
@@ -128,6 +129,7 @@
                 android:id="@+id/albumChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 app:chipIcon="@drawable/baseline_album_24"
                 app:chipIconTint="?attr/colorPrimary"
                 app:ensureMinTouchTargetSize="false" />
@@ -136,6 +138,7 @@
                 android:id="@+id/labelChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 app:chipIcon="@drawable/baseline_label_24"
                 app:chipIconTint="?attr/colorPrimary"
                 app:ensureMinTouchTargetSize="false" />
