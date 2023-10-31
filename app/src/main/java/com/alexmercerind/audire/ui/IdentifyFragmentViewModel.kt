@@ -111,8 +111,8 @@ class IdentifyFragmentViewModel : ViewModel() {
                         mutex.withLock {
                             val music = repository.identify(data!!, Constants.IDENTIFY_RECORD_DURATION_MAXIMUM)
                             if (_identifyMusic != music) {
-                                _music.emit(music!!)
                                 _identifyMusic = music
+                                _music.emit(music!!)
                             }
                         }
                     } catch (e: CancellationException) {
@@ -181,12 +181,13 @@ class IdentifyFragmentViewModel : ViewModel() {
                             // NOTE: Only allow "well known" music (with album available in it) in partial samples.
                             if (music?.album != null) {
                                 if (_identifyMusic != music) {
-                                    _music.emit(music!!)
                                     _identifyMusic = music
+                                    _music.emit(music!!)
+
+                                    stop()
                                 }
                             }
 
-                            stop()
                         } catch (e: Throwable) {
                             e.printStackTrace()
                         }

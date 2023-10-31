@@ -7,11 +7,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -39,14 +40,27 @@ class IdentifyFragment : Fragment() {
     ): View {
         _binding = FragmentIdentifyBinding.inflate(inflater, container, false)
         val view = binding.root
+        val launcher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (it) {
+                    viewModel.start()
+                } else {
+                    showRecordAudioPermissionNotAvailableDialog()
+                }
+            }
         binding.recordFloatingActionButton.setOnClickListener {
             // Request Manifest.permission.RECORD_AUDIO.
-            requestRecordAudioPermission()
-            if (checkRecordAudioPermission()) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireActivity(), Manifest.permission.RECORD_AUDIO
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
                 viewModel.start()
             } else {
-                // Manifest.permission.RECORD_AUDIO is not available.
-                showRecordAudioPermissionNotAvailableDialog()
+                try {
+                    launcher.launch(Manifest.permission.RECORD_AUDIO)
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
             }
         }
         binding.stopButton.setOnClickListener {
@@ -180,25 +194,13 @@ class IdentifyFragment : Fragment() {
         }
     }
 
-    private fun requestRecordAudioPermission() {
-        ActivityCompat.requestPermissions(
-            requireActivity(), arrayOf(Manifest.permission.RECORD_AUDIO), 0
-        )
-    }
-
-    private fun checkRecordAudioPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            requireActivity(), Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
     private fun showRecordAudioPermissionNotAvailableDialog() {
-        MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
-            .setTitle(R.string.identify_record_permission_alert_dialog_not_available_title)
+        MaterialAlertDialogBuilder(
+            requireActivity(),
+            R.style.Base_Theme_Audire_MaterialAlertDialog
+        ).setTitle(R.string.identify_record_permission_alert_dialog_not_available_title)
             .setMessage(R.string.identify_record_permission_alert_dialog_not_available_message)
-            .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
-            .create()
-            .show()
+            .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }.create().show()
 
     }
 
@@ -207,16 +209,6 @@ class IdentifyFragment : Fragment() {
         _binding = null
 
         viewModel.stop()
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        if (requestCode == 0) {
-            Log.d(Constants.LOG_TAG, permissions.toString())
-            Log.d(Constants.LOG_TAG, grantResults.toString())
-        }
     }
 
 }
