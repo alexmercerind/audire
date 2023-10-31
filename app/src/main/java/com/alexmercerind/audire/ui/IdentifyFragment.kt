@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +18,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
-import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -34,6 +32,10 @@ class IdentifyFragment : Fragment() {
     private lateinit var visibilityRecordFloatingActionButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityStopButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityWaveViewObjectAnimator: ObjectAnimator
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -79,7 +81,7 @@ class IdentifyFragment : Fragment() {
             binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.music.collect {
                 // Show the MusicActivity.
                 if (isVisible && it != null) {
@@ -90,7 +92,7 @@ class IdentifyFragment : Fragment() {
                 }
             }
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.error.collect {
                 Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
 //                    setAction(R.string.identify_error_details) {
