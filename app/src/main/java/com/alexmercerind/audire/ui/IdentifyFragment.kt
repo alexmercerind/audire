@@ -33,10 +33,6 @@ class IdentifyFragment : Fragment() {
     private lateinit var visibilityStopButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityWaveViewObjectAnimator: ObjectAnimator
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -84,7 +80,7 @@ class IdentifyFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.music.collect {
                 // Show the MusicActivity.
-                if (isVisible && it != null) {
+                if (isVisible) {
                     val intent = Intent(context, MusicActivity::class.java).apply {
                         putExtra(MusicActivity.MUSIC, it)
                     }

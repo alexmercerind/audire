@@ -118,6 +118,8 @@
                 android:id="@+id/yearChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
+                android:contentDescription="@string/year"
                 android:ellipsize="end"
                 app:chipBackgroundColor="?attr/colorPrimaryContainer"
                 app:chipIcon="@drawable/baseline_calendar_today_24"
@@ -129,6 +131,8 @@
                 android:id="@+id/albumChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
+                android:contentDescription="@string/album"
                 android:ellipsize="end"
                 app:chipIcon="@drawable/baseline_album_24"
                 app:chipIconTint="?attr/colorPrimary"
@@ -138,12 +142,57 @@
                 android:id="@+id/labelChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
+                android:contentDescription="@string/label"
                 android:ellipsize="end"
                 app:chipIcon="@drawable/baseline_label_24"
                 app:chipIconTint="?attr/colorPrimary"
                 app:ensureMinTouchTargetSize="false" />
 
         </com.google.android.material.chip.ChipGroup>
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/linksFlow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            app:constraint_referenced_ids="searchMaterialButton,spotifyMaterialButton,youtubeMaterialButton"
+            app:flow_horizontalAlign="start"
+            app:flow_horizontalBias="0.0"
+            app:flow_horizontalStyle="packed"
+            app:flow_verticalAlign="center"
+            app:flow_verticalBias="0.0"
+            app:flow_verticalGap="0dp"
+            app:flow_horizontalGap="16dp"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintTop_toBottomOf="@id/chipGroup" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/searchMaterialButton"
+            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search"
+            app:icon="@drawable/baseline_search_24" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/spotifyMaterialButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/spotify"
+            app:icon="@drawable/spotify" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/youtubeMaterialButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/youtube"
+            app:icon="@drawable/youtube" />
+
 
         <TextView
             android:id="@+id/lyricsTitleTextView"
@@ -156,7 +205,7 @@
             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+            app:layout_constraintTop_toBottomOf="@+id/linksFlow" />
 
         <TextView
             android:id="@+id/lyricsBodyTextView"
