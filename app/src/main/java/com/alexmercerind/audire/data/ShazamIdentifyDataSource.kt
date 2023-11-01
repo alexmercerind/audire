@@ -5,6 +5,8 @@ import com.alexmercerind.audire.api.shazam.models.Geolocation
 import com.alexmercerind.audire.api.shazam.models.ShazamRequestBody
 import com.alexmercerind.audire.api.shazam.models.ShazamResponse
 import com.alexmercerind.audire.api.shazam.models.Signature
+import com.alexmercerind.audire.converters.toMusic
+import com.alexmercerind.audire.converters.toShortArray
 import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.native.ShazamSignature
 import com.github.f4b6a3.uuid.UuidCreator
@@ -189,7 +191,7 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             Signature(
                 duration * 1000,
                 timestamp,
-                ShazamSignature().create(convertByteArrayToShortArray(data))
+                ShazamSignature().create(data.toShortArray())
             ),
             timestamp,
             TIMEZONES.random()
@@ -202,39 +204,6 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             USER_AGENTS.random(),
         )
 
-        return if (response.isSuccessful) convertShazamResponseToMusic(response.body()) else null
+        return if (response.isSuccessful) response.body()?.toMusic() else null
     }
-
-    private fun convertByteArrayToShortArray(data: ByteArray): ShortArray {
-        val result = ShortArray(data.size / 2)
-        for (i in 0..result.size step 2) {
-            result[i / 2] = (data[i].toInt() and 0xFF or (data[i + 1].toInt() shl 8)).toShort()
-        }
-        return result
-    }
-
-    private fun convertShazamResponseToMusic(response: ShazamResponse?) = Music(
-        response?.track?.title!!,
-        response?.track?.subtitle!!,
-        response?.track?.images?.coverarthq!!,
-        response?.track?.sections
-            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
-            ?.metadata
-            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "ALBUM" }
-            ?.text,
-        response?.track?.sections
-            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
-            ?.metadata
-            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "LABEL" }
-            ?.text,
-        response?.track?.sections
-            ?.firstOrNull { section -> section.type?.uppercase() == "SONG" }
-            ?.metadata
-            ?.firstOrNull { metadata -> metadata.title?.uppercase() == "RELEASED" }
-            ?.text,
-        response?.track?.sections
-            ?.firstOrNull { section -> section.type?.uppercase() == "LYRICS" }
-            ?.text
-            ?.joinToString("\n")
-    )
 }

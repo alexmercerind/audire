@@ -30,10 +30,6 @@ class MusicActivity : AppCompatActivity() {
     private lateinit var music: Music
     private lateinit var binding: ActivityMusicBinding
 
-    private val diskCache by lazy {
-        DiskCache.Builder().directory(cacheDir).maxSizePercent(1.0).maxSizeBytes(100 * 1024 * 1024)
-            .build()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +78,6 @@ class MusicActivity : AppCompatActivity() {
             ImageLoader.Builder(this)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
-                .diskCache(diskCache)
                 .build()
         ) {
             crossfade(true)

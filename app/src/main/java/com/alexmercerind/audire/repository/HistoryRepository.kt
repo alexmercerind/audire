@@ -10,6 +10,11 @@ class HistoryRepository(private val application: Application) {
             .historyItemDao()
             .insert(historyItem)
 
+    fun delete(historyItem: HistoryItem) =
+        HistoryItemDatabase(application)
+            .historyItemDao()
+            .delete(historyItem)
+
     fun getAll() =
         HistoryItemDatabase(application)
             .historyItemDao()

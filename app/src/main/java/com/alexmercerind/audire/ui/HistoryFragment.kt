@@ -1,14 +1,14 @@
 package com.alexmercerind.audire.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.alexmercerind.audire.adapters.HistoryItemAdapter
 import com.alexmercerind.audire.databinding.FragmentHistoryBinding
-import com.alexmercerind.audire.utils.Constants
 
 class HistoryFragment : Fragment() {
     private var _binding: FragmentHistoryBinding? = null
@@ -21,9 +21,22 @@ class HistoryFragment : Fragment() {
     ): View? {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
 
+        binding.historyLinearLayout.visibility = View.GONE
+        binding.historyRecyclerView.visibility = View.GONE
+
+        binding.historyRecyclerView.layoutManager = LinearLayoutManager(context)
+
         historyViewModel.getAll().observe(viewLifecycleOwner) {
-            // TODO: Connect to RecyclerView.
-            Log.d(Constants.LOG_TAG, it.toString())
+
+            binding.historyRecyclerView.adapter = HistoryItemAdapter(it)
+
+            if (it.isEmpty()) {
+                binding.historyLinearLayout.visibility = View.VISIBLE
+                binding.historyRecyclerView.visibility = View.GONE
+            } else {
+                binding.historyLinearLayout.visibility = View.GONE
+                binding.historyRecyclerView.visibility = View.VISIBLE
+            }
         }
 
         return binding.root

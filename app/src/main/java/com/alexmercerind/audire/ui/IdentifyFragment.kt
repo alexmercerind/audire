@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.alexmercerind.audire.R
+import com.alexmercerind.audire.converters.toHistoryItem
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -92,7 +93,7 @@ class IdentifyFragment : Fragment() {
                     // Add to Room database.
                     withContext(Dispatchers.IO) {
                         try {
-                            historyViewModel.insert(it)
+                            historyViewModel.insert(it.toHistoryItem())
                         } catch (e: Throwable) {
                             e.printStackTrace()
                         }

@@ -23,7 +23,7 @@ abstract class HistoryItemDatabase : RoomDatabase() {
             Room.databaseBuilder(
                 application,
                 HistoryItemDatabase::class.java,
-                "article_db.db"
+                "history-item-database"
             ).build()
     }
 }
