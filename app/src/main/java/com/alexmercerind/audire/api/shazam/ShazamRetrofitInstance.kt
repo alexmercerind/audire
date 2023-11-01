@@ -5,7 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-abstract class ShazamInstance {
+abstract class ShazamRetrofitInstance {
     companion object {
 
         private const val BASE_URL = "https://amp.shazam.com/"

@@ -11,20 +11,7 @@
         android:layout_height="match_parent">
 
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/materialToolbar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:paddingEnd="8dp"
-            android:theme="?attr/actionBarTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/identify_toolbar_menu"
-            app:subtitleCentered="true"
-            app:title="@string/app_name"
-            app:titleCentered="true" />
+        <include layout="@layout/primary_toolbar" />
 
         <view
             android:id="@+id/waveView"

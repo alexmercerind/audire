@@ -20,13 +20,16 @@ import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: IdentifyFragmentViewModel by viewModels()
+    private val identifyViewModel: IdentifyViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModels()
 
     private lateinit var idleFloatingActionButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityRecordFloatingActionButtonObjectAnimator: ObjectAnimator
@@ -41,7 +44,7 @@ class IdentifyFragment : Fragment() {
         val launcher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
-                    viewModel.start()
+                    identifyViewModel.start()
                 } else {
                     showRecordAudioPermissionNotAvailableDialog()
                 }
@@ -52,7 +55,7 @@ class IdentifyFragment : Fragment() {
                     requireActivity(), Manifest.permission.RECORD_AUDIO
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                viewModel.start()
+                identifyViewModel.start()
             } else {
                 try {
                     launcher.launch(Manifest.permission.RECORD_AUDIO)
@@ -62,34 +65,43 @@ class IdentifyFragment : Fragment() {
             }
         }
         binding.stopButton.setOnClickListener {
-            viewModel.stop()
+            identifyViewModel.stop()
         }
 
         // https://stackoverflow.com/a/55049571/12825435
         // https://stackoverflow.com/a/70718428/12825435
-        viewModel.idle.observe(viewLifecycleOwner) {
+        identifyViewModel.idle.observe(viewLifecycleOwner) {
             when (it) {
                 true -> animateToRecordButton()
                 false -> animateToStopButton()
             }
         }
-        viewModel.duration.observe(viewLifecycleOwner) {
+        identifyViewModel.duration.observe(viewLifecycleOwner) {
             binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.music.collect {
+            identifyViewModel.music.collect {
                 // Show the MusicActivity.
                 if (isVisible) {
                     val intent = Intent(context, MusicActivity::class.java).apply {
                         putExtra(MusicActivity.MUSIC, it)
                     }
                     startActivity(intent)
+
+                    // Add to Room database.
+                    withContext(Dispatchers.IO) {
+                        try {
+                            historyViewModel.insert(it)
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.error.collect {
+            identifyViewModel.error.collect {
                 Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
 //                    setAction(R.string.identify_error_details) {
 //                        MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
@@ -141,7 +153,7 @@ class IdentifyFragment : Fragment() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        if (viewModel.idle.value == true) {
+        if (identifyViewModel.idle.value == true) {
             binding.recordFloatingActionButton.scaleX = 1.0F
             binding.recordFloatingActionButton.scaleY = 1.0F
             binding.recordFloatingActionButton.alpha = 1.0F
@@ -206,7 +218,7 @@ class IdentifyFragment : Fragment() {
         super.onDestroyView()
         _binding = null
 
-        viewModel.stop()
+        identifyViewModel.stop()
     }
 
 }

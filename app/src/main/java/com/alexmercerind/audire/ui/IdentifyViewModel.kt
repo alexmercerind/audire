@@ -25,7 +25,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.coroutineContext
 
 
-class IdentifyFragmentViewModel : ViewModel() {
+class IdentifyViewModel : ViewModel() {
     /**
      * Whether the view is in idle state i.e. not recording.
      */

@@ -1,6 +1,6 @@
 package com.alexmercerind.audire.data
 
-import com.alexmercerind.audire.api.shazam.ShazamInstance
+import com.alexmercerind.audire.api.shazam.ShazamRetrofitInstance
 import com.alexmercerind.audire.api.shazam.models.Geolocation
 import com.alexmercerind.audire.api.shazam.models.ShazamRequestBody
 import com.alexmercerind.audire.api.shazam.models.ShazamResponse
@@ -195,7 +195,7 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             TIMEZONES.random()
         )
         val name = Random(timestamp).nextInt(1 shl 48).toString()
-        val response = ShazamInstance.api.discovery(
+        val response = ShazamRetrofitInstance.api.discovery(
             body,
             UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_DNS, name).toString(),
             UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_URL, name).toString(),
@@ -214,7 +214,6 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
     }
 
     private fun convertShazamResponseToMusic(response: ShazamResponse?) = Music(
-        null,
         response?.track?.title!!,
         response?.track?.subtitle!!,
         response?.track?.images?.coverarthq!!,

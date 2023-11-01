@@ -128,10 +128,7 @@ class MusicActivity : AppCompatActivity() {
     }
 
     private fun showFailureSnackbar() {
-        Snackbar.make(binding.root, R.string.action_view_error, Snackbar.LENGTH_LONG).apply {
-            anchorView = findViewById(R.id.bottomNavigationView)
-            show()
-        }
+        Snackbar.make(binding.root, R.string.action_view_error, Snackbar.LENGTH_LONG).show()
     }
 }
 
