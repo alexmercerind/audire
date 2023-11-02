@@ -2,7 +2,6 @@ package com.alexmercerind.audire.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
@@ -12,10 +11,14 @@ import com.alexmercerind.audire.R
 import com.alexmercerind.audire.converters.toMusic
 import com.alexmercerind.audire.databinding.HistoryItemBinding
 import com.alexmercerind.audire.models.HistoryItem
+import com.alexmercerind.audire.ui.HistoryViewModel
 import com.alexmercerind.audire.ui.MusicActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class HistoryItemAdapter(private val items: List<HistoryItem>) :
+class HistoryItemAdapter(
+    private val items: List<HistoryItem>,
+    private val historyViewModel: HistoryViewModel
+) :
     RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
     inner class HistoryItemViewHolder(val binding: HistoryItemBinding) :
@@ -55,8 +58,25 @@ class HistoryItemAdapter(private val items: List<HistoryItem>) :
                 }
             }
             root.setOnLongClickListener {
-                MaterialAlertDialogBuilder(root.context, R.style.Base_Theme_Audire_MaterialAlertDialog)
-                    .setTitle(R.)
+                MaterialAlertDialogBuilder(
+                    root.context,
+                    R.style.Base_Theme_Audire_MaterialAlertDialog
+                )
+                    .setTitle(R.string.remove_history_item_title)
+                    .setMessage(
+                        context.getString(
+                            R.string.remove_history_item_message,
+                            items[position].title
+                        )
+                    )
+                    .setPositiveButton(R.string.yes) { dialog, _ ->
+                        historyViewModel.delete(items[position])
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.dismiss()
+                    }.show()
+                true
             }
         }
 

@@ -28,7 +28,7 @@ class HistoryFragment : Fragment() {
 
         historyViewModel.getAll().observe(viewLifecycleOwner) {
 
-            binding.historyRecyclerView.adapter = HistoryItemAdapter(it)
+            binding.historyRecyclerView.adapter = HistoryItemAdapter(it, historyViewModel)
 
             if (it.isEmpty()) {
                 binding.historyLinearLayout.visibility = View.VISIBLE

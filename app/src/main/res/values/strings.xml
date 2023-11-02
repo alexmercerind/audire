@@ -18,7 +18,7 @@
     <string name="no">No</string>
     <string name="no_history_message">Your history will be displayed here</string>
     <string name="ok">OK</string>
-    <string name="remove_history_item_description">Remove this item from the history?</string>
+    <string name="remove_history_item_message">Do you want to \"%1$s\" from the history?</string>
     <string name="remove_history_item_title">Remove</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
