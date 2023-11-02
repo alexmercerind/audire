@@ -14,25 +14,22 @@ import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.ui.HistoryViewModel
 import com.alexmercerind.audire.ui.MusicActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class HistoryItemAdapter(
-    private val items: List<HistoryItem>,
-    private val historyViewModel: HistoryViewModel
-) :
-    RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
+    private val items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
+) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
     inner class HistoryItemViewHolder(val binding: HistoryItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-    }
+        RecyclerView.ViewHolder(binding.root) {}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        HistoryItemViewHolder(
-            HistoryItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = HistoryItemViewHolder(
+        HistoryItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
         )
+    )
 
     override fun getItemCount() = items.size
 
@@ -41,10 +38,8 @@ class HistoryItemAdapter(
             val context = root.context
             coverImageView.load(
                 items[position].cover,
-                ImageLoader.Builder(context)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .build()
+                ImageLoader.Builder(context).memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED).build()
             ) {
                 crossfade(true)
             }
@@ -59,21 +54,15 @@ class HistoryItemAdapter(
             }
             root.setOnLongClickListener {
                 MaterialAlertDialogBuilder(
-                    root.context,
-                    R.style.Base_Theme_Audire_MaterialAlertDialog
-                )
-                    .setTitle(R.string.remove_history_item_title)
-                    .setMessage(
+                    root.context, R.style.Base_Theme_Audire_MaterialAlertDialog
+                ).setTitle(R.string.remove_history_item_title).setMessage(
                         context.getString(
-                            R.string.remove_history_item_message,
-                            items[position].title
+                            R.string.remove_history_item_message, items[position].title
                         )
-                    )
-                    .setPositiveButton(R.string.yes) { dialog, _ ->
-                        historyViewModel.delete(items[position])
+                    ).setPositiveButton(R.string.yes) { dialog, _ ->
                         dialog.dismiss()
-                    }
-                    .setNegativeButton(R.string.no) { dialog, _ ->
+                        GlobalScope.launch(Dispatchers.IO) { historyViewModel.delete(items[position]) }
+                    }.setNegativeButton(R.string.no) { dialog, _ ->
                         dialog.dismiss()
                     }.show()
                 true

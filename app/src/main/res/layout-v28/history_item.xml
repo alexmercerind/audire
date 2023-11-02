@@ -1,5 +1,4 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="8dp"
@@ -9,9 +8,7 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     android:outlineAmbientShadowColor="@color/transparent"
-    android:outlineSpotShadowColor="@color/transparent"
-    app:cardElevation="1dp"
-    app:strokeWidth="0dp">
+    android:outlineSpotShadowColor="@color/transparent">
 
     <LinearLayout
         android:layout_width="wrap_content"
