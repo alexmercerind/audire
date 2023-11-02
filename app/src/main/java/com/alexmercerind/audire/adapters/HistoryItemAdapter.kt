@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.load
 import coil.request.CachePolicy
+import com.alexmercerind.audire.R
 import com.alexmercerind.audire.converters.toMusic
 import com.alexmercerind.audire.databinding.HistoryItemBinding
 import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.ui.MusicActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class HistoryItemAdapter(private val items: List<HistoryItem>) :
     RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
@@ -45,11 +47,16 @@ class HistoryItemAdapter(private val items: List<HistoryItem>) :
             }
             titleTextView.text = items[position].title
             artistTextView.text = items[position].artists
+            root.isLongClickable = true
             root.setOnClickListener {
-                val intent = Intent(context, MusicActivity::class.java).also {
+                Intent(context, MusicActivity::class.java).also {
                     it.putExtra(MusicActivity.MUSIC, items[position].toMusic())
                     context.startActivity(it)
                 }
+            }
+            root.setOnLongClickListener {
+                MaterialAlertDialogBuilder(root.context, R.style.Base_Theme_Audire_MaterialAlertDialog)
+                    .setTitle(R.)
             }
         }
 
