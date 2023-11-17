@@ -16,7 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.alexmercerind.audire.AboutActivity
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.converters.toHistoryItem
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
@@ -176,15 +175,13 @@ class IdentifyFragment : Fragment() {
         }
 
         view.findViewById<MaterialToolbar>(R.id.primaryMaterialToolbar).setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    // TODO:
-                }
-
-                R.id.about -> {
-                    val intent = Intent(context, AboutActivity::class.java)
-                    startActivity(intent)
-                }
+            val intent = when (it.itemId) {
+                R.id.settings -> Intent(context, SettingsActivity::class.java)
+                R.id.about -> Intent(context, AboutActivity::class.java)
+                else -> null
+            }
+            if (intent != null) {
+                startActivity(intent)
             }
             true
         }

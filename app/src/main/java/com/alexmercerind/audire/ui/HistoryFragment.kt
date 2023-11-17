@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.alexmercerind.audire.AboutActivity
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.adapters.HistoryItemAdapter
 import com.alexmercerind.audire.databinding.FragmentHistoryBinding
@@ -44,15 +43,13 @@ class HistoryFragment : Fragment() {
         }
 
         binding.root.findViewById<MaterialToolbar>(R.id.primaryMaterialToolbar).setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    // TODO:
-                }
-
-                R.id.about -> {
-                    val intent = Intent(context, AboutActivity::class.java)
-                    startActivity(intent)
-                }
+            val intent = when (it.itemId) {
+                R.id.settings -> Intent(context, SettingsActivity::class.java)
+                R.id.about -> Intent(context, AboutActivity::class.java)
+                else -> null
+            }
+            if (intent != null) {
+                startActivity(intent)
             }
             true
         }

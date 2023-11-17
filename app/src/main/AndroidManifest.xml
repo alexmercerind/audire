@@ -18,7 +18,10 @@
         android:theme="@style/Theme.Audire"
         tools:targetApi="34">
         <activity
-            android:name=".AboutActivity"
+            android:name=".ui.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.AboutActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MusicActivity"
