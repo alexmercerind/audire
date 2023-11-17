@@ -6,6 +6,11 @@
     <string name="bottom_navigation_view_history">History</string>
     <string name="bottom_navigation_view_identify">Identify</string>
     <string name="cover_art">Cover</string>
+    <string name="developer">Developer</string>
+    <string name="developer_github">Follow on GitHub</string>
+    <string name="developer_name">Hitesh Kumar Saini</string>
+    <string name="developer_x">Follow on X</string>
+    <string name="github">GitHub</string>
     <string name="identify_error">Could not identify. Retry?</string>
     <string name="identify_error_alert_dialog_title">:(</string>
     <string name="identify_error_details">Details</string>
@@ -14,10 +19,12 @@
     <string name="identify_record_permission_alert_dialog_not_available_title">Insufficient permissions</string>
     <string name="identify_stop">Stop</string>
     <string name="label">Label</string>
+    <string name="license">License</string>
     <string name="lyrics">Lyrics</string>
     <string name="no">No</string>
     <string name="no_history_message">Your history will be displayed here</string>
     <string name="ok">OK</string>
+    <string name="privacy">Privacy</string>
     <string name="remove_history_item_message">Do you want to \"%1$s\" from the history?</string>
     <string name="remove_history_item_title">Remove</string>
     <string name="search">Search</string>

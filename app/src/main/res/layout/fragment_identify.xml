@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <include layout="@layout/primary_toolbar" />
+        <include layout="@layout/primary_material_toolbar" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

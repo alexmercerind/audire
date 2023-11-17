@@ -16,9 +16,11 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.alexmercerind.audire.AboutActivity
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.converters.toHistoryItem
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -42,14 +44,13 @@ class IdentifyFragment : Fragment() {
     ): View {
         _binding = FragmentIdentifyBinding.inflate(inflater, container, false)
         val view = binding.root
-        val launcher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                if (it) {
-                    identifyViewModel.start()
-                } else {
-                    showRecordAudioPermissionNotAvailableDialog()
-                }
+        val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                identifyViewModel.start()
+            } else {
+                showRecordAudioPermissionNotAvailableDialog()
             }
+        }
         binding.recordFloatingActionButton.setOnClickListener {
             // Request Manifest.permission.RECORD_AUDIO.
             if (ActivityCompat.checkSelfPermission(
@@ -120,8 +121,8 @@ class IdentifyFragment : Fragment() {
 
         idleFloatingActionButtonObjectAnimator = ObjectAnimator.ofPropertyValuesHolder(
             binding.recordFloatingActionButton,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0F, 1.2F),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0F, 1.2F),
+            PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0F, 1.4F),
+            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0F, 1.4F),
         ).apply {
             duration = 2000L
             interpolator = AccelerateDecelerateInterpolator()
@@ -174,6 +175,20 @@ class IdentifyFragment : Fragment() {
             idleFloatingActionButtonObjectAnimator.cancel()
         }
 
+        view.findViewById<MaterialToolbar>(R.id.primaryMaterialToolbar).setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    // TODO:
+                }
+
+                R.id.about -> {
+                    val intent = Intent(context, AboutActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+            true
+        }
+
         return view
     }
 
@@ -207,8 +222,7 @@ class IdentifyFragment : Fragment() {
 
     private fun showRecordAudioPermissionNotAvailableDialog() {
         MaterialAlertDialogBuilder(
-            requireActivity(),
-            R.style.Base_Theme_Audire_MaterialAlertDialog
+            requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog
         ).setTitle(R.string.identify_record_permission_alert_dialog_not_available_title)
             .setMessage(R.string.identify_record_permission_alert_dialog_not_available_message)
             .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }.create().show()

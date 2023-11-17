@@ -11,7 +11,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import coil.ImageLoader
-import coil.disk.DiskCache
 import coil.load
 import coil.request.CachePolicy
 import com.alexmercerind.audire.R
@@ -29,7 +28,6 @@ class MusicActivity : AppCompatActivity() {
 
     private lateinit var music: Music
     private lateinit var binding: ActivityMusicBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

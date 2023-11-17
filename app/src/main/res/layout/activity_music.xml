@@ -161,11 +161,11 @@
             app:constraint_referenced_ids="searchMaterialButton,spotifyMaterialButton,youtubeMaterialButton"
             app:flow_horizontalAlign="start"
             app:flow_horizontalBias="0.0"
+            app:flow_horizontalGap="16dp"
             app:flow_horizontalStyle="packed"
             app:flow_verticalAlign="center"
             app:flow_verticalBias="0.0"
             app:flow_verticalGap="0dp"
-            app:flow_horizontalGap="16dp"
             app:flow_wrapMode="aligned"
             app:layout_constraintTop_toBottomOf="@id/chipGroup" />
 
@@ -175,7 +175,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search"
-            app:icon="@drawable/baseline_search_24" />
+            app:icon="@drawable/baseline_search_24"
+            app:iconPadding="8dp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/spotifyMaterialButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/spotifyMaterialButton"
@@ -183,7 +185,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/spotify"
-            app:icon="@drawable/spotify" />
+            app:icon="@drawable/spotify"
+            app:iconPadding="8dp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/youtubeMaterialButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/youtubeMaterialButton"
@@ -191,7 +195,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/youtube"
-            app:icon="@drawable/youtube" />
+
+            app:icon="@drawable/youtube"
+            app:iconPadding="8dp" />
 
 
         <TextView

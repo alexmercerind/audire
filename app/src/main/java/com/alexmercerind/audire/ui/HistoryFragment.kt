@@ -1,5 +1,6 @@
 package com.alexmercerind.audire.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alexmercerind.audire.AboutActivity
+import com.alexmercerind.audire.R
 import com.alexmercerind.audire.adapters.HistoryItemAdapter
 import com.alexmercerind.audire.databinding.FragmentHistoryBinding
+import com.google.android.material.appbar.MaterialToolbar
 
 class HistoryFragment : Fragment() {
     private var _binding: FragmentHistoryBinding? = null
@@ -37,6 +41,20 @@ class HistoryFragment : Fragment() {
                 binding.historyLinearLayout.visibility = View.GONE
                 binding.historyRecyclerView.visibility = View.VISIBLE
             }
+        }
+
+        binding.root.findViewById<MaterialToolbar>(R.id.primaryMaterialToolbar).setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    // TODO:
+                }
+
+                R.id.about -> {
+                    val intent = Intent(context, AboutActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+            true
         }
 
         return binding.root
