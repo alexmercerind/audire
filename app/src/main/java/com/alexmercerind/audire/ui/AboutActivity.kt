@@ -1,4 +1,4 @@
-package com.alexmercerind.audire
+package com.alexmercerind.audire.ui
 
 import android.content.Intent
 import android.net.Uri
