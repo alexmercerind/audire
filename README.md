@@ -22,6 +22,10 @@ https://github.com/alexmercerind/audire/assets/28951144/3a6f22d9-899e-4a3e-980b-
   </tr>
 </table>
 
+## Download
+
+<a href='https://play.google.com/store/apps/details?id=com.alexmercerind.audire'><img width='280px' alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+
 ## Architecture
 
 The project uses MVVM & [Android Architecture Components](https://developer.android.com/topic/architecture).
@@ -65,9 +69,14 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
 - [Room](https://developer.android.com/training/data-storage/room)
 - ...
 
-## Download
+## How
 
-<a href='https://play.google.com/store/apps/details?id=com.alexmercerind.audire'><img width='280px' alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+#### IdentifyDataSource
+
+- ShazamIdentifyDataSource is based on:
+  - https://github.com/marin-m/SongRec
+  - https://github.com/alexmercerind/shazam-signature-jni
+   
 
 ## License
 
