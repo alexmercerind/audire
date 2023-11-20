@@ -22,6 +22,49 @@ https://github.com/alexmercerind/audire/assets/28951144/3a6f22d9-899e-4a3e-980b-
   </tr>
 </table>
 
+## Architecture
+
+The project uses MVVM & [Android Architecture Components](https://developer.android.com/topic/architecture).
+
+- UI
+  - Activities & Fragments
+    - MainActivity
+    - MusicActivity
+    - SettingsActivity
+    - AboutActivity
+    - IdentifyFragment
+    - HistoryFragment
+  - View Models
+    - IdentifyViewModel
+    - HistoryViewModel
+    - SettingsViewModel
+- Repositories
+  - IdentifyRepository
+  - HistoryRepository
+  - SettingsRepository
+- Data
+  - Sources
+    - IdentifyDataSource
+        - ShazamIdentifyDataSource
+        - More in future...
+    - HistoryDataSource
+  - Models & Entities
+    - Music
+    - HistoryItem
+  - API: Retrofit
+    - ShazamAPI
+    - ShazamRetrofitInstance
+  - DB: Room
+    - HistoryItemDao
+    - HistoryItemDatabase
+
+### Libraries
+
+- [Coil](https://coil-kt.github.io/coil/)
+- [Retrofit](https://square.github.io/retrofit/)
+- [Room](https://developer.android.com/training/data-storage/room)
+- ...
+
 ## Download
 
 <a href='https://play.google.com/store/apps/details?id=com.alexmercerind.audire'><img width='280px' alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
