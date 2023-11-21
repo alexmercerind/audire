@@ -30,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.theme.filterNotNull().distinctUntilChanged().collect {
+                    Log.d(Constants.LOG_TAG, "SettingsActivity: $it")
                     binding.settingsAppearanceThemeSupportingText.text = it
                 }
             }
@@ -37,7 +38,10 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.systemColorScheme.filterNotNull().distinctUntilChanged().collect {
-                    binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked = it
+                    Log.d(Constants.LOG_TAG, "SettingsActivity: $it")
+                    if (binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked != it) {
+                        binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked = it
+                    }
                 }
             }
         }
@@ -57,8 +61,6 @@ class SettingsActivity : AppCompatActivity() {
             popup.apply {
                 setOnMenuItemClickListener { item ->
 
-                    Log.d(Constants.LOG_TAG, item.toString())
-
                     // EDIT:
                     settingsViewModel.setTheme(item.toString())
 
@@ -77,23 +79,22 @@ class SettingsActivity : AppCompatActivity() {
             // EDIT:
             settingsViewModel.setSystemColorScheme(!binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked)
 
-            Snackbar.make(
-                binding.root, R.string.settings_application_restart_required, Snackbar.LENGTH_LONG
-            ).apply {
+            Snackbar.make(binding.root, R.string.settings_application_restart_required, Snackbar.LENGTH_LONG).apply {
                 setAction(R.string.ok) { dismiss() }
                 show()
             }
+
         }
-        binding.settingsAppearanceSystemColorSchemeMaterialSwitch.setOnCheckedChangeListener { _, checked ->
+        binding.settingsAppearanceSystemColorSchemeMaterialSwitch.setOnCheckedChangeListener { view, checked ->
 
             // EDIT:
             settingsViewModel.setSystemColorScheme(checked)
 
-            Snackbar.make(
-                binding.root, R.string.settings_application_restart_required, Snackbar.LENGTH_LONG
-            ).apply {
-                setAction(R.string.ok) { dismiss() }
-                show()
+            if (view.isPressed) {
+                Snackbar.make(binding.root, R.string.settings_application_restart_required, Snackbar.LENGTH_LONG).apply {
+                    setAction(R.string.ok) { dismiss() }
+                    show()
+                }
             }
         }
     }
