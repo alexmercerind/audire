@@ -35,6 +35,7 @@
     <string name="settings_appearance_theme_dark">Dark</string>
     <string name="settings_appearance_theme_light">Light</string>
     <string name="settings_appearance_theme_system">System</string>
+    <string name="settings_application_restart_required">Application restart is required</string>
     <string name="spotify">Spotify</string>
     <string name="year">Year</string>
     <string name="yes">Yes</string>

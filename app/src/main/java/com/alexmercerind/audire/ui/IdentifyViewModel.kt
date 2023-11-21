@@ -182,7 +182,7 @@ class IdentifyViewModel : ViewModel() {
                             if (music?.album != null) {
                                 if (_identifyMusic != music) {
                                     _identifyMusic = music
-                                    _music.emit(music!!)
+                                    _music.emit(music)
 
                                     stop()
                                 }
@@ -215,7 +215,6 @@ class IdentifyViewModel : ViewModel() {
                 instance = AudioRecord(
                     AudioSource.MIC, SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE
                 )
-
                 Log.d(Constants.LOG_TAG, "IdentifyFragmentViewModel: AudioRecord")
             }
         }

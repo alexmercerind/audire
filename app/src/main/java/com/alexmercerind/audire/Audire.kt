@@ -1,11 +1,11 @@
 package com.alexmercerind.audire
 
 import android.app.Application
-import com.google.android.material.color.DynamicColors
+import com.alexmercerind.audire.ui.SettingsViewModel
 
 class Audire : Application() {
     override fun onCreate() {
         super.onCreate()
-        DynamicColors.applyToActivitiesIfAvailable(this)
+        SettingsViewModel(this).apply()
     }
 }

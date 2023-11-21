@@ -45,7 +45,8 @@ class IdentifyFragment : Fragment() {
         val view = binding.root
         val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
-                identifyViewModel.start()
+                // FUCK YOU
+                // identifyViewModel.start()
             } else {
                 showRecordAudioPermissionNotAvailableDialog()
             }
