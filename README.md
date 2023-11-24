@@ -54,7 +54,8 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
   - Sources
     - IdentifyDataSource
         - ShazamIdentifyDataSource
-        - More in future...
+        - AUDDIdentifyDataSource
+        - ...
     - HistoryDataSource
   - Models & Entities
     - Music
@@ -62,6 +63,8 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
   - API: Retrofit
     - ShazamAPI
     - ShazamRetrofitInstance
+    - AUDDAPI
+    - AUDDRetrofitInstance
   - DB: Room
     - HistoryItemDao
     - HistoryItemDatabase
@@ -82,6 +85,7 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
     - https://github.com/alexmercerind/shazam-signature-jni
 2. AUDDIdentifyDataSource is based on:
     - https://audd.io
+3. ...
 
 ## License
 
