@@ -28,11 +28,20 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Sign APK
+      uses: r0adkll/sign-android-release@v1   
+      id: sign_app
+      with:
+       releaseDirectory: ./app/build/outputs/apk/release/
+       signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+       alias: ${{ secrets.ALIAS }}
+       keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}    
+       keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Upload artifact
       uses: actions/upload-artifact@v1
       with:
         name: app-release
-        path: ./app/build/outputs/apk/release/app-release.apk
+        path: ${{ steps.sign_app.outputs.signedReleaseFile }}
     - name: GitHub release
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/main'
@@ -41,4 +50,4 @@ jobs:
         prerelease: false
         tag_name: "vnext"
         files: |
-          ./app/build/outputs/apk/release/app-release.apk
+          ${{ steps.sign_app.outputs.signedReleaseFile }}
