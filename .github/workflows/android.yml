@@ -35,7 +35,7 @@ jobs:
        releaseDirectory: ./app/build/outputs/apk/release/
        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
        alias: ${{ secrets.ALIAS }}
-       keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}    
+       keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
        keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Upload artifact
       uses: actions/upload-artifact@v1
@@ -49,5 +49,6 @@ jobs:
         draft: true
         prerelease: false
         tag_name: "vnext"
+        token: ${{ secrets.ACCESS_TOKEN }}
         files: |
           ${{ steps.sign_app.outputs.signedReleaseFile }}
