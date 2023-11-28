@@ -14,10 +14,12 @@ import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.ui.HistoryViewModel
 import com.alexmercerind.audire.ui.MusicActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 class HistoryItemAdapter(
     private val items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
 ) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
