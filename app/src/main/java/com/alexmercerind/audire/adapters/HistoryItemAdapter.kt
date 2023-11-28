@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 class HistoryItemAdapter(
-    private val items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
+    val items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
 ) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
     inner class HistoryItemViewHolder(val binding: HistoryItemBinding) :
@@ -58,15 +58,15 @@ class HistoryItemAdapter(
                 MaterialAlertDialogBuilder(
                     root.context, R.style.Base_Theme_Audire_MaterialAlertDialog
                 ).setTitle(R.string.remove_history_item_title).setMessage(
-                        context.getString(
-                            R.string.remove_history_item_message, items[position].title
-                        )
-                    ).setPositiveButton(R.string.yes) { dialog, _ ->
-                        dialog.dismiss()
-                        GlobalScope.launch(Dispatchers.IO) { historyViewModel.delete(items[position]) }
-                    }.setNegativeButton(R.string.no) { dialog, _ ->
-                        dialog.dismiss()
-                    }.show()
+                    context.getString(
+                        R.string.remove_history_item_message, items[position].title
+                    )
+                ).setPositiveButton(R.string.yes) { dialog, _ ->
+                    dialog.dismiss()
+                    GlobalScope.launch(Dispatchers.IO) { historyViewModel.delete(items[position]) }
+                }.setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }.show()
                 true
             }
         }
