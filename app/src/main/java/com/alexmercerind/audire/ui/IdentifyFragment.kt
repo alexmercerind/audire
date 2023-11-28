@@ -15,11 +15,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.converters.toHistoryItem
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -83,38 +84,42 @@ class IdentifyFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            identifyViewModel.music.collect {
-                // Show the MusicActivity.
-                if (isVisible) {
-                    val intent = Intent(context, MusicActivity::class.java).apply {
-                        putExtra(MusicActivity.MUSIC, it)
-                    }
-                    startActivity(intent)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                identifyViewModel.music.collect {
+                    // Show the MusicActivity.
+                    if (isVisible) {
+                        val intent = Intent(context, MusicActivity::class.java).apply {
+                            putExtra(MusicActivity.MUSIC, it)
+                        }
+                        startActivity(intent)
 
-                    // Add to Room database.
-                    withContext(Dispatchers.IO) {
-                        try {
-                            historyViewModel.insert(it.toHistoryItem())
-                        } catch (e: Throwable) {
-                            e.printStackTrace()
+                        // Add to Room database.
+                        withContext(Dispatchers.IO) {
+                            try {
+                                historyViewModel.insert(it.toHistoryItem())
+                            } catch (e: Throwable) {
+                                e.printStackTrace()
+                            }
                         }
                     }
                 }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            identifyViewModel.error.collect {
-                Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
-//                    setAction(R.string.identify_error_details) {
-//                        MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
-//                            .setTitle(R.string.identify_error)
-//                            .setMessage(error)
-//                            .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
-//                            .create()
-//                            .show()
-//                    }
-                    anchorView = requireActivity().findViewById(R.id.bottomNavigationView)
-                    show()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                identifyViewModel.error.collect {
+                    Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
+//                        setAction(R.string.identify_error_details) {
+//                            MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
+//                                .setTitle(R.string.identify_error)
+//                                .setMessage(error)
+//                                .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
+//                                .create()
+//                                .show()
+//                        }
+                        anchorView = requireActivity().findViewById(R.id.bottomNavigationView)
+                        show()
+                    }
                 }
             }
         }
@@ -175,7 +180,7 @@ class IdentifyFragment : Fragment() {
             idleFloatingActionButtonObjectAnimator.cancel()
         }
 
-        view.findViewById<MaterialToolbar>(R.id.primaryMaterialToolbar).setOnMenuItemClickListener {
+        binding.primaryMaterialToolbar.setOnMenuItemClickListener {
             val intent = when (it.itemId) {
                 R.id.settings -> Intent(context, SettingsActivity::class.java)
                 R.id.about -> Intent(context, AboutActivity::class.java)

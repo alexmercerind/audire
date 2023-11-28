@@ -47,6 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical|start"
+            android:inputType="textCapWords|textAutoCorrect"
+            android:maxLines="1"
             android:padding="0dp"
             android:textAlignment="gravity" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -80,6 +82,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no_history_message"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/searchLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/baseline_search_24"
+            android:backgroundTint="?attr/colorOnSurfaceVariant"
+            android:contentDescription="@string/no_search_results" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_search_results"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
     </LinearLayout>

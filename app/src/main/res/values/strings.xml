@@ -23,6 +23,7 @@
     <string name="lyrics">Lyrics</string>
     <string name="no">No</string>
     <string name="no_history_message">Your history will be displayed here</string>
+    <string name="no_search_results">Nothing like that was found</string>
     <string name="ok">OK</string>
     <string name="privacy">Privacy</string>
     <string name="remove_history_item_message">Do you want to \"%1$s\" from the history?</string>
