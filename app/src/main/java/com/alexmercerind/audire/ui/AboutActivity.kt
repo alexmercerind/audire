@@ -12,7 +12,7 @@ class AboutActivity : AppCompatActivity() {
     companion object {
         private const val GITHUB = "https://github.com/alexmercerind/audire"
         private const val LICENSE = "https://github.com/alexmercerind/audire/blob/main/LICENSE"
-        private const val PRIVACY = "https://github.com/alexmercerind/audire/blob/main/PRIVACY"
+        private const val PRIVACY = "https://github.com/alexmercerind/audire/wiki/Privacy-Policy-%5BPlay-Store%5D"
 
         private const val DEVELOPER_GITHUB = "https://github.com/alexmercerind"
         private const val DEVELOPER_X = "https://x.com/alexmercerind"
