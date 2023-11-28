@@ -12,19 +12,52 @@
         android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@id/historyRecyclerView">
 
-        <include layout="@layout/primary_material_toolbar" />
-
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/primaryMaterialToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:menu="@menu/history_material_toolbar_menu"
+            app:subtitleCentered="true"
+            app:title="@string/app_name"
+            app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchTextInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp"
+        app:endIconDrawable="@drawable/baseline_clear_24"
+        app:endIconMode="custom"
+        app:placeholderText="@string/search">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchTextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|start"
+            android:padding="0dp"
+            android:textAlignment="gravity" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/historyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:paddingBottom="8dp" />
 
     <LinearLayout
         android:id="@+id/historyLinearLayout"
@@ -50,5 +83,6 @@
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
     </LinearLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
