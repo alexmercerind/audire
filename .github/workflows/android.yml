@@ -49,5 +49,6 @@ jobs:
         draft: true
         prerelease: false
         tag_name: "vnext"
+        token: ${{ secrets.ACCESS_TOKEN }}
         files: |
           ${{ steps.sign_app.outputs.signedReleaseFile }}
