@@ -3,7 +3,6 @@ package com.alexmercerind.audire.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.alexmercerind.audire.adapters.HistoryItemAdapter
 import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.repository.HistoryRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,14 +15,14 @@ import kotlinx.coroutines.sync.withLock
 
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
     /**
-     * HistoryItemAdapter to be used with RecyclerView.
+     * HistoryItem(s) to be used displayed in RecyclerView.
      *
      * Automatically handles if a search term is entered.
      */
-    val adapter: StateFlow<HistoryItemAdapter?>
-        get() = _adapter
+    val historyItems: StateFlow<List<HistoryItem>?>
+        get() = _historyItems
 
-    private val _adapter = MutableStateFlow<HistoryItemAdapter?>(null)
+    private val _historyItems = MutableStateFlow<List<HistoryItem>?>(null)
 
     var term: String = ""
         set(value) {
@@ -35,15 +34,13 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
             field = value
             viewModelScope.launch(Dispatchers.IO) {
                 mutex.withLock {
-                    _adapter.emit(
-                        HistoryItemAdapter(
-                            when (value) {
-                                // Search term == "" -> Show all HistoryItem(s)
-                                "" -> getAll().first()
-                                // Search term != "" -> Show search HistoryItem(s)
-                                else -> search(value.lowercase())
-                            }, this@HistoryViewModel
-                        )
+                    _historyItems.emit(
+                        when (value) {
+                            // Search term == "" -> Show all HistoryItem(s)
+                            "" -> getAll().first()
+                            // Search term != "" -> Show search HistoryItem(s)
+                            else -> search(value.lowercase())
+                        }
                     )
                 }
             }
@@ -56,11 +53,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     init {
         viewModelScope.launch(Dispatchers.IO) {
             getAll().collect {
-                _adapter.emit(
-                    HistoryItemAdapter(
-                        it, this@HistoryViewModel
-                    )
-                )
+                _historyItems.emit(it)
             }
         }
     }
@@ -69,7 +62,11 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     private suspend fun search(term: String) = repository.search(term)
 
-    fun insert(historyItem: HistoryItem) = repository.insert(historyItem)
+    suspend fun insert(historyItem: HistoryItem) = repository.insert(historyItem)
 
-    fun delete(historyItem: HistoryItem) = repository.delete(historyItem)
+    suspend fun delete(historyItem: HistoryItem) = repository.delete(historyItem)
+
+    suspend fun like(historyItem: HistoryItem) = repository.like(historyItem)
+
+    suspend fun unlike(historyItem: HistoryItem) = repository.unlike(historyItem)
 }

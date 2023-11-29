@@ -21,7 +21,7 @@ import com.alexmercerind.audire.databinding.FragmentHistoryBinding
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-class HistoryFragment : Fragment() {
+class LikedFragment : Fragment() {
 
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
@@ -64,25 +64,27 @@ class HistoryFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                historyViewModel.historyItems.filterNotNull().collect {
-                    if (it.isEmpty()) {
-                        binding.historyRecyclerView.visibility = View.GONE
-                        if (historyViewModel.term.isEmpty()) {
-                            // No HistoryItem(s) by default.
-                            binding.historyLinearLayout.visibility = View.VISIBLE
-                            binding.searchLinearLayout.visibility = View.GONE
+                historyViewModel.historyItems.filterNotNull().collect { it ->
+                    it.filter { it.liked }.let {
+                        if (it.isEmpty()) {
+                            binding.historyRecyclerView.visibility = View.GONE
+                            if (historyViewModel.term.isEmpty()) {
+                                // No HistoryItem(s) by default.
+                                binding.historyLinearLayout.visibility = View.VISIBLE
+                                binding.searchLinearLayout.visibility = View.GONE
+                            } else {
+                                // No HistoryItem(s) due to search.
+                                binding.historyLinearLayout.visibility = View.GONE
+                                binding.searchLinearLayout.visibility = View.VISIBLE
+                            }
                         } else {
-                            // No HistoryItem(s) due to search.
+                            // HistoryItem(s) are present i.e. RecyclerView must be VISIBLE.
+                            binding.historyRecyclerView.visibility = View.VISIBLE
                             binding.historyLinearLayout.visibility = View.GONE
-                            binding.searchLinearLayout.visibility = View.VISIBLE
+                            binding.searchLinearLayout.visibility = View.GONE
+                            (binding.historyRecyclerView.adapter as HistoryItemAdapter).items = it
+                            (binding.historyRecyclerView.adapter as HistoryItemAdapter).notifyDataSetChanged()
                         }
-                    } else {
-                        // HistoryItem(s) are present i.e. RecyclerView must be VISIBLE.
-                        binding.historyRecyclerView.visibility = View.VISIBLE
-                        binding.historyLinearLayout.visibility = View.GONE
-                        binding.searchLinearLayout.visibility = View.GONE
-                        (binding.historyRecyclerView.adapter as HistoryItemAdapter).items = it
-                        (binding.historyRecyclerView.adapter as HistoryItemAdapter).notifyItemRangeChanged(0, it.size)
                     }
                 }
             }

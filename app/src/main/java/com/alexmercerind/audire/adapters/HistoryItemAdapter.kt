@@ -2,6 +2,7 @@ package com.alexmercerind.audire.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 class HistoryItemAdapter(
-    val items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
+    var items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
 ) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
     inner class HistoryItemViewHolder(val binding: HistoryItemBinding) :
@@ -68,6 +69,21 @@ class HistoryItemAdapter(
                     dialog.dismiss()
                 }.show()
                 true
+            }
+
+            likedImageView.visibility = if (items[position].liked) View.VISIBLE else View.GONE
+            unlikedImageView.visibility = if (!items[position].liked) View.VISIBLE else View.GONE
+
+            likeFrameLayout.setOnClickListener {
+                if (items[position].liked) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        historyViewModel.unlike(items[position])
+                    }
+                } else {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        historyViewModel.like(items[position])
+                    }
+                }
             }
         }
 
