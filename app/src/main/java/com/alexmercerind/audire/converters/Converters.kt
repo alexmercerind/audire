@@ -5,8 +5,6 @@ import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.models.Music
 import java.util.Calendar
 
-// TODO: What's the recommended practice to convert between entities & models etc.
-
 fun ByteArray.toShortArray(): ShortArray {
     val result = ShortArray(size / 2)
     for (i in 0..result.size step 2) {
@@ -49,7 +47,8 @@ fun Music.toHistoryItem() = HistoryItem(
     album,
     label,
     year,
-    lyrics
+    lyrics,
+    false
 )
 
 fun HistoryItem.toMusic() = Music(

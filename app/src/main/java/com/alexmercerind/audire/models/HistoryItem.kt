@@ -16,4 +16,5 @@ data class HistoryItem(
     @ColumnInfo(name = "label") val label: String?,
     @ColumnInfo(name = "year") val year: String?,
     @ColumnInfo(name = "lyrics") val lyrics: String?,
+    @ColumnInfo(name = "liked", defaultValue = "0") val liked: Boolean
 ) : Serializable
