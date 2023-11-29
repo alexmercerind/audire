@@ -1,4 +1,3 @@
-
 <img align="left" src="https://github.com/alexmercerind/audire/assets/28951144/d78cf14e-c6cc-411c-9c80-0294c6abc83a" width="64" height="64"></img>
 
 <h1 align="left">Audire</h1>
@@ -24,7 +23,13 @@ https://github.com/alexmercerind/audire/assets/28951144/3a6f22d9-899e-4a3e-980b-
 
 ## Download
 
-<a href='https://play.google.com/store/apps/details?id=com.alexmercerind.audire'><img width='280px' alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+- [GitHub Releases](https://github.com/alexmercerind/audire/releases/latest)
+- [Google Play Store](https://play.google.com/store/apps/details?id=com.alexmercerind.audire)
+- [IzzySoft](https://apt.izzysoft.de/fdroid/index/apk/com.alexmercerind.audire)
+
+## Building
+
+Refer to [CI](https://github.com/alexmercerind/audire/blob/main/.github/workflows/android.yml).
 
 ## Architecture
 
@@ -50,7 +55,8 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
   - Sources
     - IdentifyDataSource
         - ShazamIdentifyDataSource
-        - More in future...
+        - AUDDIdentifyDataSource
+        - ...
     - HistoryDataSource
   - Models & Entities
     - Music
@@ -58,6 +64,8 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
   - API: Retrofit
     - ShazamAPI
     - ShazamRetrofitInstance
+    - AUDDAPI
+    - AUDDRetrofitInstance
   - DB: Room
     - HistoryItemDao
     - HistoryItemDatabase
@@ -71,15 +79,17 @@ The project uses MVVM & [Android Architecture Components](https://developer.andr
 
 ## How
 
-#### IdentifyDataSource
+#### Notes
 
-- ShazamIdentifyDataSource is based on:
-  - https://github.com/marin-m/SongRec
-  - https://github.com/alexmercerind/shazam-signature-jni
-   
+1. ShazamIdentifyDataSource is based on:
+    - https://github.com/marin-m/SongRec
+    - https://github.com/alexmercerind/shazam-signature-jni
+2. AUDDIdentifyDataSource is based on:
+    - https://audd.io
+3. ...
 
 ## License
 
-![gplv3-with-text-136x68](https://github.com/alexmercerind/audire/assets/28951144/5546336a-fec9-431e-92af-a4619863d818)
+![](https://github.com/alexmercerind/audire/assets/28951144/5546336a-fec9-431e-92af-a4619863d818)
 
 This project & the work under this repository is governed by GNU General Public License v3.0.
