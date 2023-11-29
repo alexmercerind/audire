@@ -82,8 +82,14 @@ class LikedFragment : Fragment() {
                             binding.historyRecyclerView.visibility = View.VISIBLE
                             binding.historyLinearLayout.visibility = View.GONE
                             binding.searchLinearLayout.visibility = View.GONE
-                            (binding.historyRecyclerView.adapter as HistoryItemAdapter).items = it
-                            (binding.historyRecyclerView.adapter as HistoryItemAdapter).notifyDataSetChanged()
+                            val adapter = binding.historyRecyclerView.adapter as HistoryItemAdapter
+                            if (adapter.items.size != it.size) {
+                                adapter.items = it
+                                adapter.notifyDataSetChanged()
+                            } else {
+                                adapter.items = it
+                                adapter.notifyItemRangeChanged(0, it.size)
+                            }
                         }
                     }
                 }
