@@ -14,7 +14,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -31,8 +31,8 @@ class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
     private val binding get() = _binding!!
 
-    private val identifyViewModel: IdentifyViewModel by viewModels()
-    private val historyViewModel: HistoryViewModel by viewModels()
+    private val identifyViewModel: IdentifyViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
 
     private lateinit var idleFloatingActionButtonObjectAnimator: ObjectAnimator
     private lateinit var visibilityRecordFloatingActionButtonObjectAnimator: ObjectAnimator
