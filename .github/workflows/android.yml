@@ -37,11 +37,13 @@ jobs:
        alias: ${{ secrets.ALIAS }}
        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}    
        keyPassword: ${{ secrets.KEY_PASSWORD }}
+    - name: Copy release APK
+      run: cp ${{ steps.sign_app.outputs.signedReleaseFile }} ./app/build/outputs/apk/release/app-release-signed.apk
     - name: Upload artifact
       uses: actions/upload-artifact@v1
       with:
         name: app-release
-        path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+        path: ./app/build/outputs/apk/release/app-release-signed.apk
     - name: GitHub release
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/main'
@@ -51,4 +53,4 @@ jobs:
         tag_name: "vnext"
         token: ${{ secrets.ACCESS_TOKEN }}
         files: |
-          ${{ steps.sign_app.outputs.signedReleaseFile }}
+          ./app/build/outputs/apk/release/app-release-signed.apk
