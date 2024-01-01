@@ -39,6 +39,17 @@
     <string name="settings_appearance_theme_light">Light</string>
     <string name="settings_appearance_theme_system">System</string>
     <string name="settings_application_restart_required">Application restart is required</string>
+    <string name="settings_backup">Backup</string>
+    <string name="settings_backup_export">Export history</string>
+    <string name="settings_backup_export_fail">Export failed</string>
+    <string name="settings_backup_export_success">Export successful</string>
+    <string name="settings_backup_export_supporting_text">Backup history to JSON file</string>
+    <string name="settings_backup_file_mime">application/json</string>
+    <string name="settings_backup_file_name">History</string>
+    <string name="settings_backup_import">Import history</string>
+    <string name="settings_backup_import_fail">Import failed</string>
+    <string name="settings_backup_import_success">Import successful</string>
+    <string name="settings_backup_import_supporting_text">Restore history from JSON file</string>
     <string name="spotify">Spotify</string>
     <string name="year">Year</string>
     <string name="yes">Yes</string>
