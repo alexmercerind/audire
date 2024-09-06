@@ -23,7 +23,7 @@ class MusicActivity : AppCompatActivity() {
     companion object {
         const val MUSIC = "MUSIC"
         const val SPOTIFY_PACKAGE_NAME = "com.spotify.music"
-        const val YOUTUBE_PACKAGE_NAME = "com.google.android.youtube"
+        const val YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query="
     }
 
     private lateinit var music: Music
@@ -107,11 +107,10 @@ class MusicActivity : AppCompatActivity() {
         }
         binding.youtubeMaterialButton.setOnClickListener {
             try {
-                val intent = Intent(Intent.ACTION_SEARCH).apply {
-                    setPackage(YOUTUBE_PACKAGE_NAME)
-                    putExtra(SearchManager.QUERY, music.createSearchQuery())
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
+                val query = java.net.URLEncoder.encode(music.createSearchQuery(), "utf-8")
+                val url = YOUTUBE_SEARCH_URL + query
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
                 startActivity(intent)
             } catch (e: Throwable) {
                 showFailureSnackbar()
