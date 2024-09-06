@@ -83,7 +83,7 @@ class MusicActivity : AppCompatActivity() {
 
         binding.searchMaterialButton.setOnClickListener {
             try {
-                val uri = Uri.parse("https://www.google.com/search?q=${music.createSearchQuery()}")
+                val uri = Uri.parse("https://www.duckduckgo.com/?q=${music.createSearchQuery()}")
                 val intent = Intent(Intent.ACTION_VIEW, uri)
                 startActivity(intent)
             } catch (e: Throwable) {
