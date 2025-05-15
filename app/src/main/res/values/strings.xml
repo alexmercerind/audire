@@ -44,7 +44,7 @@
     <string name="settings_backup_export_fail">Export failed</string>
     <string name="settings_backup_export_success">Export successful</string>
     <string name="settings_backup_export_supporting_text">Backup history to JSON file</string>
-    <string name="settings_backup_file_mime">application/json</string>
+    <string name="settings_backup_file_mime" translatable="false">application/json</string>
     <string name="settings_backup_file_name">History</string>
     <string name="settings_backup_import">Import history</string>
     <string name="settings_backup_import_fail">Import failed</string>
