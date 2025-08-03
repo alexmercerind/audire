@@ -21,20 +21,20 @@ class FindMusicTileService : TileService() {
 
         handled = false
 
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
-            flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TOP
-        }
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> startActivityAndCollapse(
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE
-                )
-            )
-
-            else -> startActivityAndCollapse(intent)
-        }
+//        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+//            flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TOP
+//        }
+//        when {
+//            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> startActivityAndCollapse(
+//                PendingIntent.getActivity(
+//                    applicationContext,
+//                    0,
+//                    intent,
+//                    PendingIntent.FLAG_IMMUTABLE
+//                )
+//            )
+//
+//            else -> startActivityAndCollapse(intent)
+//        }
     }
 }

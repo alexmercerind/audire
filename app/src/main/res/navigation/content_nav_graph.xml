@@ -33,7 +33,7 @@
         android:id="@+id/likedFragment"
         android:name="com.alexmercerind.audire.ui.LikedFragment"
         android:label="fragment_liked"
-        tools:layout="@layout/fragment_liked" >
+        tools:layout="@layout/fragment_history" >
         <action
             android:id="@+id/action_likedFragment_to_identifyFragment"
             app:destination="@id/identifyFragment" />
