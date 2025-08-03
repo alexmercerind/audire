@@ -27,7 +27,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
             }
 
             field = value
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 mutex.withLock {
                     _historyItems.emit(
                         when (value) {
@@ -46,7 +46,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
     private val repository = HistoryRepository(application)
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             getAll().collect {
                 _historyItems.emit(it)
             }
@@ -57,11 +57,11 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     private suspend fun search(query: String) = repository.search(query)
 
-    suspend fun insert(historyItem: HistoryItem) = repository.insert(historyItem)
+    fun insert(historyItem: HistoryItem) = viewModelScope.launch(Dispatchers.IO) { repository.insert(historyItem) }
 
-    suspend fun delete(historyItem: HistoryItem) = repository.delete(historyItem)
+    fun delete(historyItem: HistoryItem) = viewModelScope.launch(Dispatchers.IO) { repository.delete(historyItem) }
 
-    suspend fun like(historyItem: HistoryItem) = repository.like(historyItem)
+    fun like(historyItem: HistoryItem) = viewModelScope.launch(Dispatchers.IO) { repository.like(historyItem) }
 
-    suspend fun unlike(historyItem: HistoryItem) = repository.unlike(historyItem)
+    fun unlike(historyItem: HistoryItem) = viewModelScope.launch(Dispatchers.IO) { repository.unlike(historyItem) }
 }

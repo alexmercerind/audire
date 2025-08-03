@@ -63,19 +63,19 @@ class IdentifyViewModel : ViewModel() {
             .launchIn(viewModelScope)
     }
 
+    private fun <T> Flow<T>.sampleImmediate(periodMillis: Long): Flow<T> = channelFlow {
+        var lastEmitTime = 0L
+        collect { value ->
+            val now = System.currentTimeMillis()
+            if (lastEmitTime == 0L || now - lastEmitTime >= periodMillis) {
+                lastEmitTime = now
+                trySend(value)
+            }
+        }
+    }
+
     companion object {
         const val MIN_DURATION = 3
         const val MAX_DURATION = 12
-    }
-}
-
-fun <T> Flow<T>.sampleImmediate(periodMillis: Long): Flow<T> = channelFlow {
-    var lastEmitTime = 0L
-    collect { value ->
-        val now = System.currentTimeMillis()
-        if (lastEmitTime == 0L || now - lastEmitTime >= periodMillis) {
-            lastEmitTime = now
-            trySend(value)
-        }
     }
 }

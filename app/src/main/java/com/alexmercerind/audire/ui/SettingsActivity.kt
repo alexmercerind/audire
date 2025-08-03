@@ -14,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.ActivitySettingsBinding
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -26,13 +25,16 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val exportLauncher =
             registerForActivityResult(ActivityResultContracts.CreateDocument(getString(R.string.settings_backup_file_mime))) { uri ->
                 if (uri != null) {
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch {
                         try {
                             settingsViewModel.export(uri)
                             Snackbar.make(binding.root, R.string.settings_backup_export_success, Snackbar.LENGTH_LONG).show()
@@ -46,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         val importLauncher =
             registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
                 if (uri != null) {
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch {
                         try {
                             settingsViewModel.import(uri)
                             Snackbar.make(binding.root, R.string.settings_backup_import_success, Snackbar.LENGTH_LONG).show()

@@ -48,7 +48,7 @@ class AudioRecorder(private val scope: CoroutineScope) {
     }
 
     fun stop() {
-        scope.launch(Dispatchers.IO) {
+        scope.launch {
             mutex.withLock {
                 if (!_active.value) return@launch
                 job?.cancelAndJoin()

@@ -1,13 +1,13 @@
 package com.alexmercerind.audire.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import com.alexmercerind.audire.databinding.ActivityAboutBinding
+import androidx.core.net.toUri
 
 class AboutActivity : AppCompatActivity() {
     companion object {
@@ -24,6 +24,9 @@ class AboutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         binding = ActivityAboutBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -48,7 +51,7 @@ class AboutActivity : AppCompatActivity() {
     private fun setOnClickListener(view: View, uri: String) {
         view.setOnClickListener {
             try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                val intent = Intent(Intent.ACTION_VIEW, uri.toUri())
                 startActivity(intent)
             } catch (e: Throwable) {
                 e.printStackTrace()

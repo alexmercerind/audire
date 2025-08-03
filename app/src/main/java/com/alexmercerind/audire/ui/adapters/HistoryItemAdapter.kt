@@ -9,21 +9,16 @@ import coil.ImageLoader
 import coil.load
 import coil.request.CachePolicy
 import com.alexmercerind.audire.R
-import com.alexmercerind.audire.mappers.toMusic
 import com.alexmercerind.audire.databinding.HistoryItemBinding
+import com.alexmercerind.audire.mappers.toMusic
 import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.ui.HistoryViewModel
 import com.alexmercerind.audire.ui.MusicActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 class HistoryItemAdapter(
     var items: List<HistoryItem>,
-    private val historyViewModel: HistoryViewModel
+    private val historyViewModel: HistoryViewModel,
 ) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
     inner class HistoryItemViewHolder(val binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root)
@@ -66,7 +61,7 @@ class HistoryItemAdapter(
                     )
                 ).setPositiveButton(R.string.yes) { dialog, _ ->
                     dialog.dismiss()
-                    GlobalScope.launch(Dispatchers.IO) { historyViewModel.delete(items[position]) }
+                    historyViewModel.delete(items[position])
                 }.setNegativeButton(R.string.no) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
@@ -78,13 +73,9 @@ class HistoryItemAdapter(
 
             likeFrameLayout.setOnClickListener {
                 if (items[position].liked) {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        historyViewModel.unlike(items[position])
-                    }
+                    historyViewModel.unlike(items[position])
                 } else {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        historyViewModel.like(items[position])
-                    }
+                    historyViewModel.like(items[position])
                 }
             }
         }

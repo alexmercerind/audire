@@ -23,9 +23,7 @@ import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
 import com.alexmercerind.audire.mappers.toHistoryItem
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class IdentifyFragment : Fragment() {
     private var _binding: FragmentIdentifyBinding? = null
@@ -82,9 +80,7 @@ class IdentifyFragment : Fragment() {
                             }
                             startActivity(intent)
                             // Add to Room database.
-                            withContext(Dispatchers.IO) {
-                                runCatching { historyViewModel.insert(it.toHistoryItem()) }
-                            }
+                            runCatching { historyViewModel.insert(it.toHistoryItem()) }
                         }
                     }
                 }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 class SettingsRepository(private val application: Application) {
-
     val theme: StateFlow<String?>
         get() = _theme
     private val _theme = MutableStateFlow<String?>(null)

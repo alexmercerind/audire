@@ -1,13 +1,8 @@
 package com.alexmercerind.audire.services
 
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.alexmercerind.audire.ui.MainActivity
 
 @RequiresApi(Build.VERSION_CODES.N)
 class FindMusicTileService : TileService() {
