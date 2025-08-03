@@ -28,7 +28,8 @@
             app:menu="@menu/identify_material_toolbar_menu"
             app:subtitleCentered="true"
             app:title="@string/app_name"
-            app:titleCentered="true" />
+            app:titleCentered="true"
+            tools:ignore="RtlSymmetry" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

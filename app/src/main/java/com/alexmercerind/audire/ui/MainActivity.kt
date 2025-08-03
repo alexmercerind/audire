@@ -1,9 +1,9 @@
 package com.alexmercerind.audire.ui
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
         // https://stackoverflow.com/a/50537193/12825435
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.content) as NavHostFragment
         binding.bottomNavigationView.setupWithNavController(navHostFragment.navController)

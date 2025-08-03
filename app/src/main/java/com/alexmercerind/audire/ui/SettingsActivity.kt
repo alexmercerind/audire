@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.PopupMenu
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -72,6 +74,8 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.materialToolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.settingsAppearanceThemeLinearLayout.setOnClickListener {
             val popup = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) PopupMenu(

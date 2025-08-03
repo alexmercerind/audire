@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.repository.ShazamIdentifyRepository
 import com.alexmercerind.audire.utils.AudioRecorder
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.sample
-
 
 class IdentifyViewModel : ViewModel() {
     val error get() = _error.asSharedFlow()
@@ -42,7 +42,7 @@ class IdentifyViewModel : ViewModel() {
         combine(audioRecorder.duration, audioRecorder.buffer) { duration, buffer ->
             duration to buffer
         }
-            .sample(2000L)
+            .sampleImmediate(2000L)
             .onEach { (duration, buffer) ->
                 runCatching {
                     if (buffer.isEmpty()) return@onEach
@@ -66,5 +66,16 @@ class IdentifyViewModel : ViewModel() {
     companion object {
         const val MIN_DURATION = 3
         const val MAX_DURATION = 12
+    }
+}
+
+fun <T> Flow<T>.sampleImmediate(periodMillis: Long): Flow<T> = channelFlow {
+    var lastEmitTime = 0L
+    collect { value ->
+        val now = System.currentTimeMillis()
+        if (lastEmitTime == 0L || now - lastEmitTime >= periodMillis) {
+            lastEmitTime = now
+            trySend(value)
+        }
     }
 }
