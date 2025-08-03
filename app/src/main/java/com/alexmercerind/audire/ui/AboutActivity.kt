@@ -41,6 +41,7 @@ class AboutActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
+        binding.materialToolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         setOnClickListener(binding.githubLinearLayout, GITHUB)
         setOnClickListener(binding.licenseLinearLayout, LICENSE)
         setOnClickListener(binding.privacyLinearLayout, PRIVACY)

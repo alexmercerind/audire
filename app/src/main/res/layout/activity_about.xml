@@ -20,8 +20,11 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/materialToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/baseline_arrow_back_24"
+                app:navigationIconTint="?attr/colorOnSurface"
                 android:elevation="0dp"
                 app:title="@string/about">
 
@@ -46,28 +49,28 @@
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.Material3.CardView.Filled"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="96dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="16dp"
-                android:backgroundTint="?attr/colorPrimaryFixed"
+                android:backgroundTint="?attr/colorAboutTileBg"
                 android:baselineAligned="false"
                 android:orientation="horizontal"
-                app:cardCornerRadius="28dp">
+                app:cardCornerRadius="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_launcher_foreground"
-                        app:tint="?attr/colorOnPrimaryFixedVariant" />
+                        app:tint="?attr/colorAboutTileFg0" />
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center_vertical|start"
                         android:orientation="vertical"
@@ -79,14 +82,14 @@
                             android:layout_height="wrap_content"
                             android:text="@string/app_name"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="?attr/colorOnPrimaryFixed" />
+                            android:textColor="?attr/colorAboutTileFg0" />
 
                         <TextView
                             android:id="@+id/descriptionTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                            android:textColor="?attr/colorOnPrimaryFixed" />
+                            android:textColor="?attr/colorAboutTileFg1" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
