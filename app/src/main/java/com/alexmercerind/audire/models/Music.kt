@@ -9,5 +9,5 @@ data class Music(
     val album: String?,
     val label: String?,
     val year: String?,
-    val lyrics: String?,
+    val lyrics: String?
 ) : Serializable

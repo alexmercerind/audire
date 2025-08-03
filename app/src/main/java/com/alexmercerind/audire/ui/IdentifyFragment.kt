@@ -19,8 +19,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alexmercerind.audire.R
-import com.alexmercerind.audire.converters.toHistoryItem
 import com.alexmercerind.audire.databinding.FragmentIdentifyBinding
+import com.alexmercerind.audire.mappers.toHistoryItem
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -53,72 +53,52 @@ class IdentifyFragment : Fragment() {
             }
         }
         binding.recordFloatingActionButton.setOnClickListener {
-            // Request Manifest.permission.RECORD_AUDIO.
-            if (ActivityCompat.checkSelfPermission(
-                    requireActivity(), Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 identifyViewModel.start()
             } else {
-                try {
-                    launcher.launch(Manifest.permission.RECORD_AUDIO)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
+                runCatching { launcher.launch(Manifest.permission.RECORD_AUDIO) }
             }
         }
         binding.stopButton.setOnClickListener {
             identifyViewModel.stop()
         }
 
-        // https://stackoverflow.com/a/55049571/12825435
-        // https://stackoverflow.com/a/70718428/12825435
-        identifyViewModel.idle.observe(viewLifecycleOwner) {
-            when (it) {
-                true -> animateToRecordButton()
-                false -> animateToStopButton()
-            }
-        }
-        identifyViewModel.duration.observe(viewLifecycleOwner) {
-            binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
+     viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                identifyViewModel.music.collect {
-                    // Show the MusicActivity.
-                    if (isVisible) {
-                        val intent = Intent(context, MusicActivity::class.java).apply {
-                            putExtra(MusicActivity.MUSIC, it)
+                launch {
+                    identifyViewModel.error.collect {
+                        Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
+                            anchorView = requireActivity().findViewById(R.id.bottomNavigationView)
+                            show()
                         }
-                        startActivity(intent)
-
-                        // Add to Room database.
-                        withContext(Dispatchers.IO) {
-                            try {
-                                historyViewModel.insert(it.toHistoryItem())
-                            } catch (e: Throwable) {
-                                e.printStackTrace()
+                    }
+                }
+                launch {
+                    identifyViewModel.music.collect {
+                        if (isVisible) {
+                            // Show the MusicActivity.
+                            val intent = Intent(context, MusicActivity::class.java).apply {
+                                putExtra(MusicActivity.MUSIC, it)
+                            }
+                            startActivity(intent)
+                            // Add to Room database.
+                            withContext(Dispatchers.IO) {
+                                runCatching { historyViewModel.insert(it.toHistoryItem()) }
                             }
                         }
                     }
                 }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                identifyViewModel.error.collect {
-                    Snackbar.make(view, R.string.identify_error, Snackbar.LENGTH_LONG).apply {
-//                        setAction(R.string.identify_error_details) {
-//                            MaterialAlertDialogBuilder(requireActivity(), R.style.Base_Theme_Audire_MaterialAlertDialog)
-//                                .setTitle(R.string.identify_error)
-//                                .setMessage(error)
-//                                .setPositiveButton(R.string.ok) { dialog, _ -> dialog?.dismiss() }
-//                                .create()
-//                                .show()
-//                        }
-                        anchorView = requireActivity().findViewById(R.id.bottomNavigationView)
-                        show()
+                launch {
+                    identifyViewModel.active.collect {
+                        when (it) {
+                            false -> animateToRecordButton()
+                            true -> animateToStopButton()
+                        }
+                    }
+                }
+                launch {
+                    identifyViewModel.duration.collect {
+                        binding.stopButton.text = DateUtils.formatElapsedTime(it.toLong())
                     }
                 }
             }
@@ -160,16 +140,7 @@ class IdentifyFragment : Fragment() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        if (identifyViewModel.idle.value == true) {
-            binding.recordFloatingActionButton.scaleX = 1.0F
-            binding.recordFloatingActionButton.scaleY = 1.0F
-            binding.recordFloatingActionButton.alpha = 1.0F
-            binding.stopButton.scaleX = 0.5F
-            binding.stopButton.scaleY = 0.5F
-            binding.stopButton.alpha = 0.0F
-            binding.waveView.alpha = 0.0F
-            idleFloatingActionButtonObjectAnimator.start()
-        } else {
+        if (identifyViewModel.active.value) {
             binding.recordFloatingActionButton.scaleX = 0.5F
             binding.recordFloatingActionButton.scaleY = 0.5F
             binding.recordFloatingActionButton.alpha = 0.0F
@@ -178,6 +149,15 @@ class IdentifyFragment : Fragment() {
             binding.stopButton.alpha = 1.0F
             binding.waveView.alpha = 1.0F
             idleFloatingActionButtonObjectAnimator.cancel()
+        } else {
+            binding.recordFloatingActionButton.scaleX = 1.0F
+            binding.recordFloatingActionButton.scaleY = 1.0F
+            binding.recordFloatingActionButton.alpha = 1.0F
+            binding.stopButton.scaleX = 0.5F
+            binding.stopButton.scaleY = 0.5F
+            binding.stopButton.alpha = 0.0F
+            binding.waveView.alpha = 0.0F
+            idleFloatingActionButtonObjectAnimator.start()
         }
 
         binding.primaryMaterialToolbar.setOnMenuItemClickListener {

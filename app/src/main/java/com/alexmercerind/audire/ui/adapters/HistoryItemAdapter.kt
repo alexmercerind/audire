@@ -1,4 +1,4 @@
-package com.alexmercerind.audire.adapters
+package com.alexmercerind.audire.ui.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import coil.ImageLoader
 import coil.load
 import coil.request.CachePolicy
 import com.alexmercerind.audire.R
-import com.alexmercerind.audire.converters.toMusic
+import com.alexmercerind.audire.mappers.toMusic
 import com.alexmercerind.audire.databinding.HistoryItemBinding
 import com.alexmercerind.audire.models.HistoryItem
 import com.alexmercerind.audire.ui.HistoryViewModel
@@ -22,15 +22,17 @@ import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 class HistoryItemAdapter(
-    var items: List<HistoryItem>, private val historyViewModel: HistoryViewModel
+    var items: List<HistoryItem>,
+    private val historyViewModel: HistoryViewModel
 ) : RecyclerView.Adapter<HistoryItemAdapter.HistoryItemViewHolder>() {
 
-    inner class HistoryItemViewHolder(val binding: HistoryItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {}
+    inner class HistoryItemViewHolder(val binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = HistoryItemViewHolder(
         HistoryItemBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
     )
 

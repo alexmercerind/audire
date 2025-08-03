@@ -1,19 +1,17 @@
 package com.alexmercerind.audire.ui
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.ActivitySettingsBinding
-import com.alexmercerind.audire.utils.Constants
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -61,7 +59,6 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.theme.filterNotNull().distinctUntilChanged().collect {
-                    Log.d(Constants.LOG_TAG, "SettingsActivity: $it")
                     binding.settingsAppearanceThemeSupportingText.text = it
                 }
             }
@@ -69,7 +66,6 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.systemColorScheme.filterNotNull().distinctUntilChanged().collect {
-                    Log.d(Constants.LOG_TAG, "SettingsActivity: $it")
                     if (binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked != it) {
                         binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked = it
                     }

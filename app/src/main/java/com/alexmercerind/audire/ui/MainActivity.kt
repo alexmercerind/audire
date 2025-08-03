@@ -22,8 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         // https://stackoverflow.com/a/50537193/12825435
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.content) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.content) as NavHostFragment
         binding.bottomNavigationView.setupWithNavController(navHostFragment.navController)
     }
 

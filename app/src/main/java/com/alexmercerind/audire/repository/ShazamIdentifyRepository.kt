@@ -1,22 +1,67 @@
-package com.alexmercerind.audire.data
+package com.alexmercerind.audire.repository
 
-import com.alexmercerind.audire.api.shazam.ShazamRetrofitInstance
+import com.alexmercerind.audire.api.shazam.ShazamAPI
 import com.alexmercerind.audire.api.shazam.models.Geolocation
 import com.alexmercerind.audire.api.shazam.models.ShazamRequestBody
-import com.alexmercerind.audire.api.shazam.models.ShazamResponse
 import com.alexmercerind.audire.api.shazam.models.Signature
-import com.alexmercerind.audire.converters.toMusic
-import com.alexmercerind.audire.converters.toShortArray
+import com.alexmercerind.audire.mappers.toMusic
+import com.alexmercerind.audire.mappers.toShortArray
 import com.alexmercerind.audire.models.Music
 import com.alexmercerind.audire.native.ShazamSignature
 import com.github.f4b6a3.uuid.UuidCreator
 import com.github.f4b6a3.uuid.enums.UuidNamespace
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Calendar
 import kotlin.random.Random
 
-class ShazamIdentifyDataSource : IdentifyDataSource {
+class ShazamIdentifyRepository : IdentifyRepository() {
+    private val client: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+            .build()
+    }
+
+    private val api: ShazamAPI by lazy {
+        Retrofit.Builder()
+            .client(client)
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ShazamAPI::class.java)
+    }
+
+    override suspend fun identify(duration: Int, data: ByteArray): Music? {
+        val timestamp = Calendar.getInstance().time.time.toInt()
+        val name = Random(timestamp).nextInt(1 shl 48).toString()
+        val body = ShazamRequestBody(
+            Geolocation(
+                Random(timestamp).nextDouble() * 400 + 100,
+                Random(timestamp).nextDouble() * 180 - 90,
+                Random(timestamp).nextDouble() * 360 - 180
+            ),
+            Signature(
+                duration * 1000,
+                timestamp,
+                ShazamSignature().create(data.toShortArray())
+            ),
+            timestamp,
+            TIMEZONES.random()
+        )
+        val response = api.discovery(
+            body,
+            UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_DNS, name).toString(),
+            UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_URL, name).toString(),
+            USER_AGENTS.random(),
+        )
+        return response.body()?.toMusic()
+    }
+
     companion object {
-        val USER_AGENTS = arrayOf<String>(
+        private const val BASE_URL = "https://amp.shazam.com/"
+        private val USER_AGENTS = arrayOf(
             "Dalvik/2.1.0 (Linux; U; Android 5.0.2; VS980 4G Build/LRX22G)",
             "Dalvik/1.6.0 (Linux; U; Android 4.4.2; SM-T210 Build/KOT49H)",
             "Dalvik/2.1.0 (Linux; U; Android 5.1.1; SM-P905V Build/LMY47X)",
@@ -118,7 +163,7 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             "Dalvik/1.6.0 (Linux; U; Android 4.2.2; SM-T217S Build/JDQ39)",
             "Dalvik/1.6.0 (Linux; U; Android 4.4.4; SAMSUNG-SM-N900A Build/KTU84P)"
         )
-        val TIMEZONES = arrayOf(
+        private val TIMEZONES = arrayOf(
             "Europe/Amsterdam",
             "Europe/Andorra",
             "Europe/Astrakhan",
@@ -178,32 +223,5 @@ class ShazamIdentifyDataSource : IdentifyDataSource {
             "Europe/Zagreb",
             "Europe/Zurich"
         )
-    }
-
-    override suspend fun identify(data: ByteArray, duration: Int): Music? {
-        val timestamp = Calendar.getInstance().time.time.toInt()
-        val body = ShazamRequestBody(
-            Geolocation(
-                Random(timestamp).nextDouble() * 400 + 100,
-                Random(timestamp).nextDouble() * 180 - 90,
-                Random(timestamp).nextDouble() * 360 - 180
-            ),
-            Signature(
-                duration * 1000,
-                timestamp,
-                ShazamSignature().create(data.toShortArray())
-            ),
-            timestamp,
-            TIMEZONES.random()
-        )
-        val name = Random(timestamp).nextInt(1 shl 48).toString()
-        val response = ShazamRetrofitInstance.api.discovery(
-            body,
-            UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_DNS, name).toString(),
-            UuidCreator.getNameBasedSha1(UuidNamespace.NAMESPACE_URL, name).toString(),
-            USER_AGENTS.random(),
-        )
-
-        return if (response.isSuccessful) response.body()?.toMusic() else null
     }
 }

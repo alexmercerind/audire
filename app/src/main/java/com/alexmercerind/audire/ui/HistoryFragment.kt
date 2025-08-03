@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexmercerind.audire.R
-import com.alexmercerind.audire.adapters.HistoryItemAdapter
+import com.alexmercerind.audire.ui.adapters.HistoryItemAdapter
 import com.alexmercerind.audire.databinding.FragmentHistoryBinding
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ class HistoryFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable?) {
-            historyViewModel.term = s.toString()
+            historyViewModel.query = s.toString()
         }
     }
 
@@ -67,7 +67,7 @@ class HistoryFragment : Fragment() {
                 historyViewModel.historyItems.filterNotNull().collect {
                     if (it.isEmpty()) {
                         binding.historyRecyclerView.visibility = View.GONE
-                        if (historyViewModel.term.isEmpty()) {
+                        if (historyViewModel.query.isEmpty()) {
                             // No HistoryItem(s) by default.
                             binding.historyLinearLayout.visibility = View.VISIBLE
                             binding.searchLinearLayout.visibility = View.GONE
@@ -127,8 +127,7 @@ class HistoryFragment : Fragment() {
         super.onStop()
         binding.searchTextInputEditText.removeTextChangedListener(watcher)
         binding.searchTextInputEditText.text?.clear()
-
-        historyViewModel.term = ""
+        historyViewModel.query = ""
     }
 
     override fun onDestroyView() {

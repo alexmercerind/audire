@@ -3,10 +3,12 @@ package com.alexmercerind.audire.ui
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.alexmercerind.audire.repository.HistoryRepository
 import com.alexmercerind.audire.repository.ImportExportRepository
 import com.alexmercerind.audire.repository.SettingsRepository
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val historyRepository = HistoryRepository(application)
@@ -17,14 +19,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val systemColorScheme = settingsRepository.systemColorScheme
 
-    fun setTheme(value: String) = settingsRepository.setTheme(value)
+    fun setTheme(value: String) = viewModelScope.launch { settingsRepository.setTheme(value) }
 
-    fun setSystemColorScheme(value: Boolean) = settingsRepository.setSystemColorScheme(value)
+    fun setSystemColorScheme(value: Boolean) = viewModelScope.launch { settingsRepository.setSystemColorScheme(value) }
 
-    suspend fun import(uri: Uri) = importExportRepository.import(uri)
+    fun import(uri: Uri) = viewModelScope.launch { importExportRepository.import(uri) }
 
-    suspend fun export(uri: Uri) = importExportRepository.export(
-        uri,
-        historyRepository.getAll().first()
-    )
+    fun export(uri: Uri) = viewModelScope.launch { importExportRepository.export(uri, historyRepository.getAll().first()) }
 }

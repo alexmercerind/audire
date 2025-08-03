@@ -7,8 +7,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class ImportExportRepository(private val application: Application) {
-    private val gson = Gson()
-
     suspend fun import(uri: Uri) {
         val input = application.contentResolver.openInputStream(uri)
         input?.use {
@@ -28,5 +26,9 @@ class ImportExportRepository(private val application: Application) {
             val json = gson.toJson(historyItems)
             it.write(json.toByteArray(Charsets.UTF_16))
         }
+    }
+
+    companion object {
+        private val gson by lazy { Gson() }
     }
 }

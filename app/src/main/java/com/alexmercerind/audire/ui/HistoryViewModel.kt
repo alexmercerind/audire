@@ -14,17 +14,12 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
-    /**
-     * HistoryItem(s) to be used displayed in RecyclerView.
-     *
-     * Automatically handles if a search term is entered.
-     */
     val historyItems: StateFlow<List<HistoryItem>?>
         get() = _historyItems
 
     private val _historyItems = MutableStateFlow<List<HistoryItem>?>(null)
 
-    var term: String = ""
+    var query: String = ""
         set(value) {
             // Avoid duplicate operation in Room.
             if (value == field) {
@@ -36,9 +31,9 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
                 mutex.withLock {
                     _historyItems.emit(
                         when (value) {
-                            // Search term == "" -> Show all HistoryItem(s)
+                            // Search query == "" -> Show all HistoryItem(s)
                             "" -> getAll().first()
-                            // Search term != "" -> Show search HistoryItem(s)
+                            // Search query != "" -> Show search HistoryItem(s)
                             else -> search(value.lowercase())
                         }
                     )
@@ -60,7 +55,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getAll() = repository.getAll()
 
-    private suspend fun search(term: String) = repository.search(term)
+    private suspend fun search(query: String) = repository.search(query)
 
     suspend fun insert(historyItem: HistoryItem) = repository.insert(historyItem)
 

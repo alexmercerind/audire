@@ -6,17 +6,11 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.alexmercerind.audire.R
 import com.google.android.material.color.DynamicColors
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalStateException
 
-
-@OptIn(DelicateCoroutinesApi::class)
 class SettingsRepository(private val application: Application) {
 
     val theme: StateFlow<String?>
@@ -46,43 +40,27 @@ class SettingsRepository(private val application: Application) {
         _systemColorScheme.value = systemColorSchemeValue
     }
 
-    fun setTheme(value: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            sharedPreferences.edit().apply {
-                putString(SHARED_PREFERENCES_KEY_APPEARANCE_THEME, value)
-                apply()
-            }
-            _theme.emit(value)
-
-            withContext(Dispatchers.Main) { applyTheme(value) }
+    suspend fun setTheme(value: String) {
+        sharedPreferences.edit().apply {
+            putString(SHARED_PREFERENCES_KEY_APPEARANCE_THEME, value)
+            apply()
         }
+        _theme.emit(value)
+        withContext(Dispatchers.Main) { applyTheme(value) }
     }
 
-
-
-    fun setSystemColorScheme(value: Boolean) {
-        GlobalScope.launch(Dispatchers.IO) {
-            sharedPreferences.edit().apply {
-                putBoolean(SHARED_PREFERENCES_KEY_APPEARANCE_SYSTEM_COLOR_SCHEME, value)
-                apply()
-            }
-            _systemColorScheme.emit(value)
-
-            withContext(Dispatchers.Main) { applySystemColorScheme(value) }
+    suspend fun setSystemColorScheme(value: Boolean) {
+        sharedPreferences.edit().apply {
+            putBoolean(SHARED_PREFERENCES_KEY_APPEARANCE_SYSTEM_COLOR_SCHEME, value)
+            apply()
         }
+        _systemColorScheme.emit(value)
+        withContext(Dispatchers.Main) { applySystemColorScheme(value) }
     }
 
     fun apply() {
-        try {
-            applyTheme(themeSharedValue)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-        try {
-            applySystemColorScheme(systemColorSchemeValue)
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+        runCatching { applyTheme(themeSharedValue) }
+        runCatching { applySystemColorScheme(systemColorSchemeValue) }
     }
 
     private fun applyTheme(value: String) {
