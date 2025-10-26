@@ -56,7 +56,6 @@ class HistoryFragment : Fragment() {
 
         binding.searchTextInputLayout.setEndIconOnClickListener {
             binding.searchTextInputEditText.text?.clear()
-            binding.primaryMaterialToolbar.visibility = View.VISIBLE
             binding.searchTextInputLayout.visibility = View.GONE
             binding.searchTextInputLayout.clearFocus()
             imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
@@ -98,7 +97,6 @@ class HistoryFragment : Fragment() {
 
         binding.primaryMaterialToolbar.setOnMenuItemClickListener {
             if (it.itemId == R.id.search) {
-                binding.primaryMaterialToolbar.visibility = View.GONE
                 binding.searchTextInputLayout.visibility = View.VISIBLE
                 binding.searchTextInputLayout.requestFocus()
                 imm.showSoftInput(binding.searchTextInputEditText, 0)
