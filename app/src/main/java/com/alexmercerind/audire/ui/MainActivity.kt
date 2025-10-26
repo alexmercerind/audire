@@ -37,8 +37,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                if (!FindMusicTileService.handled || settingsViewModel.autoStart.value) {
+                if (!FindMusicTileService.handled || (!SettingsViewModel.autoStartHandled && settingsViewModel.autoStart.value)) {
                     FindMusicTileService.handled = true
+                    SettingsViewModel.autoStartHandled = true
                     identifyViewModel.start()
                 }
             }

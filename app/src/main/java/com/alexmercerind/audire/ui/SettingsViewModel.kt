@@ -11,6 +11,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        var autoStartHandled = false
+    }
+
     private val historyRepository = HistoryRepository(application)
     private val settingsRepository = SettingsRepository(application)
     private val importExportRepository = ImportExportRepository(application)
