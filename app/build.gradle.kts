@@ -48,6 +48,10 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+
+    lint {
+        disable.add("MissingTranslation")
+    }
 }
 
 dependencies {
