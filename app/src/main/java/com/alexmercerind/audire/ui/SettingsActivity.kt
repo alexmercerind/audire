@@ -62,6 +62,16 @@ class SettingsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.autoStart.filterNotNull().distinctUntilChanged().collect {
+                    if (binding.settingsBehaviorAutoStartMaterialSwitch.isChecked != it) {
+                        binding.settingsBehaviorAutoStartMaterialSwitch.isChecked = it
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.theme.filterNotNull().distinctUntilChanged().collect {
                     binding.settingsAppearanceThemeSupportingText.text = it
                 }
@@ -78,6 +88,13 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.materialToolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        binding.settingsBehaviorAutoStartLinearLayout.setOnClickListener {
+            settingsViewModel.setAutoStart(!binding.settingsBehaviorAutoStartMaterialSwitch.isChecked)
+        }
+        binding.settingsBehaviorAutoStartMaterialSwitch.setOnCheckedChangeListener { view, checked ->
+            settingsViewModel.setAutoStart(checked)
+        }
 
         binding.settingsAppearanceThemeLinearLayout.setOnClickListener {
             val popup = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) PopupMenu(
@@ -108,8 +125,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.settingsAppearanceSystemColorSchemeLinearLayout.setOnClickListener {
-
-            // EDIT:
             settingsViewModel.setSystemColorScheme(!binding.settingsAppearanceSystemColorSchemeMaterialSwitch.isChecked)
 
             Snackbar.make(binding.root, R.string.settings_application_restart_required, Snackbar.LENGTH_LONG).apply {
@@ -119,8 +134,6 @@ class SettingsActivity : AppCompatActivity() {
 
         }
         binding.settingsAppearanceSystemColorSchemeMaterialSwitch.setOnCheckedChangeListener { view, checked ->
-
-            // EDIT:
             settingsViewModel.setSystemColorScheme(checked)
 
             if (view.isPressed) {

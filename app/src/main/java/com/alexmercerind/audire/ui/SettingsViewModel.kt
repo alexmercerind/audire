@@ -15,9 +15,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val settingsRepository = SettingsRepository(application)
     private val importExportRepository = ImportExportRepository(application)
 
+    val autoStart = settingsRepository.autoStart
+
     val theme = settingsRepository.theme
 
     val systemColorScheme = settingsRepository.systemColorScheme
+
+    fun setAutoStart(value: Boolean) = viewModelScope.launch { settingsRepository.setAutoStart(value) }
 
     fun setTheme(value: String) = viewModelScope.launch { settingsRepository.setTheme(value) }
 

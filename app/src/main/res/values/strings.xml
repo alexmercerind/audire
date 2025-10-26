@@ -50,6 +50,8 @@
     <string name="settings_backup_import_fail">Import failed</string>
     <string name="settings_backup_import_success">Import successful</string>
     <string name="settings_backup_import_supporting_text">Restore history from JSON file</string>
+    <string name="settings_behavior">Behavior</string>
+    <string name="settings_behavior_auto_start">Identify on app launch</string>
     <string name="spotify">Spotify</string>
     <string name="year">Year</string>
     <string name="yes">Yes</string>

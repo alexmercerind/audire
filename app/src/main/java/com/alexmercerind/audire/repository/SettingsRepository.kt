@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 class SettingsRepository(private val application: Application) {
+    val autoStart: StateFlow<Boolean>
+        get() = _autoStart
+    private val _autoStart = MutableStateFlow(false)
+
     val theme: StateFlow<String?>
         get() = _theme
     private val _theme = MutableStateFlow<String?>(null)
@@ -23,6 +27,11 @@ class SettingsRepository(private val application: Application) {
     private val sharedPreferences =
         application.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
 
+    private val autoStartSharedValue
+        get() = sharedPreferences.getBoolean(
+            SHARED_PREFERENCES_KEY_BEHAVIOR_AUTO_START,
+            false
+        )
     private val themeSharedValue
         get() = sharedPreferences.getString(
             SHARED_PREFERENCES_KEY_APPEARANCE_THEME,
@@ -35,8 +44,17 @@ class SettingsRepository(private val application: Application) {
         )
 
     init {
+        _autoStart.value = autoStartSharedValue
         _theme.value = themeSharedValue
         _systemColorScheme.value = systemColorSchemeValue
+    }
+
+    suspend fun setAutoStart(value: Boolean) {
+        sharedPreferences.edit().apply {
+            putBoolean(SHARED_PREFERENCES_KEY_BEHAVIOR_AUTO_START, value)
+            apply()
+        }
+        _autoStart.emit(value)
     }
 
     suspend fun setTheme(value: String) {
@@ -83,6 +101,7 @@ class SettingsRepository(private val application: Application) {
 
     companion object {
         private const val SHARED_PREFERENCES_NAME = "SETTINGS"
+        private const val SHARED_PREFERENCES_KEY_BEHAVIOR_AUTO_START = "AUTO_START"
         private const val SHARED_PREFERENCES_KEY_APPEARANCE_THEME = "THEME"
         private const val SHARED_PREFERENCES_KEY_APPEARANCE_SYSTEM_COLOR_SCHEME = "SYSTEM_COLOR_SCHEME"
 
