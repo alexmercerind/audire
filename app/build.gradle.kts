@@ -14,8 +14,8 @@ android {
         applicationId = "com.alexmercerind.audire"
         minSdk = 21
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
 
     buildFeatures {
@@ -36,12 +36,12 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlin {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
+            jvmTarget = JvmTarget.JVM_21
         }
     }
 

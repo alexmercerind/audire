@@ -35,59 +35,6 @@ Refer to [CI](https://github.com/alexmercerind/audire/blob/main/.github/workflow
 
 The project uses MVVM & [Android Architecture Components](https://developer.android.com/topic/architecture).
 
-- UI
-  - Activities & Fragments
-    - MainActivity
-    - MusicActivity
-    - SettingsActivity
-    - AboutActivity
-    - IdentifyFragment
-    - HistoryFragment
-  - View Models
-    - IdentifyViewModel
-    - HistoryViewModel
-    - SettingsViewModel
-- Repositories
-  - IdentifyRepository
-  - HistoryRepository
-  - SettingsRepository
-- Data
-  - Sources
-    - IdentifyDataSource
-        - ShazamIdentifyDataSource
-        - AUDDIdentifyDataSource
-        - ...
-    - HistoryDataSource
-  - Models & Entities
-    - Music
-    - HistoryItem
-  - API: Retrofit
-    - ShazamAPI
-    - ShazamRetrofitInstance
-    - AUDDAPI
-    - AUDDRetrofitInstance
-  - DB: Room
-    - HistoryItemDao
-    - HistoryItemDatabase
-
-### Libraries
-
-- [Coil](https://coil-kt.github.io/coil/)
-- [Retrofit](https://square.github.io/retrofit/)
-- [Room](https://developer.android.com/training/data-storage/room)
-- ...
-
-## How
-
-#### Notes
-
-1. ShazamIdentifyDataSource is based on:
-    - https://github.com/marin-m/SongRec
-    - https://github.com/alexmercerind/shazam-signature-jni
-2. AUDDIdentifyDataSource is based on:
-    - https://audd.io
-3. ...
-
 ## License
 
 ![](https://github.com/alexmercerind/audire/assets/28951144/5546336a-fec9-431e-92af-a4619863d818)

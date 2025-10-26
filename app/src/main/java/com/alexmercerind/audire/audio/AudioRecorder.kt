@@ -1,8 +1,8 @@
-package com.alexmercerind.audire.utils
+package com.alexmercerind.audire.audio
 
 import android.media.AudioFormat
 import android.media.AudioRecord
-import android.media.MediaRecorder.AudioSource
+import android.media.MediaRecorder
 import android.os.Process
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,13 +28,14 @@ class AudioRecorder(private val scope: CoroutineScope) {
     val duration get() = _duration.asStateFlow()
     val buffer get() = _buffer.asStateFlow()
 
+
     @Throws(SecurityException::class)
     fun start() {
         scope.launch {
             mutex.withLock {
                 if (_active.value) return@launch
                 instance = AudioRecord(
-                    AudioSource.MIC,
+                    MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
                     CHANNEL_CONFIG,
                     AUDIO_FORMAT,

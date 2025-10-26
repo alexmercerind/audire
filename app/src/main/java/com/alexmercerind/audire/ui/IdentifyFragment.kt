@@ -211,8 +211,5 @@ class IdentifyFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-
-        identifyViewModel.stop()
     }
-
 }
