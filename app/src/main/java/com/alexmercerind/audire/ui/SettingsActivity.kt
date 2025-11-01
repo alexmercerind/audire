@@ -97,23 +97,14 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.settingsAppearanceThemeLinearLayout.setOnClickListener {
-            val popup = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) PopupMenu(
+            val popup = PopupMenu(
                 this,
                 binding.settingsAppearanceThemePopupMenuAnchor,
                 Gravity.CENTER,
-            ) else PopupMenu(
-                this,
-                binding.settingsAppearanceThemePopupMenuAnchor,
-                Gravity.CENTER,
-                com.google.android.material.R.attr.popupMenuStyle,
-                0
             )
             popup.apply {
                 setOnMenuItemClickListener { item ->
-
-                    // EDIT:
                     settingsViewModel.setTheme(item.toString())
-
                     true
                 }
                 menu.add(R.string.settings_appearance_theme_light)

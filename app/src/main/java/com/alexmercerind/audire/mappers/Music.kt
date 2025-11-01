@@ -25,3 +25,16 @@ fun Music.toSearchQuery() = listOfNotNull(
 )
     .joinToString(" ")
     .trim()
+
+fun Music.toShareText() = buildString {
+    append(title)
+    if (artists.isNotBlank()) {
+        append("\n$artists")
+    }
+    if (!album.isNullOrBlank()) {
+        append("\n$album")
+    }
+    if (!year.isNullOrBlank()) {
+        append(" ($year)")
+    }
+}

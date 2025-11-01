@@ -3,6 +3,7 @@
     <string name="action_view_error">Couldn\'t start the application</string>
     <string name="album">Album</string>
     <string name="app_name">Audire</string>
+    <string name="artist">Artist</string>
     <string name="bottom_navigation_view_history">History</string>
     <string name="bottom_navigation_view_identify">Identify</string>
     <string name="cover_art">Cover</string>
@@ -56,4 +57,5 @@
     <string name="year">Year</string>
     <string name="yes">Yes</string>
     <string name="youtube">YouTube</string>
+    <string name="share">Share</string>
 </resources>

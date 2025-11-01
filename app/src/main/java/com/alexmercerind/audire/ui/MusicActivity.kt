@@ -1,29 +1,38 @@
 package com.alexmercerind.audire.ui
 
 import android.app.SearchManager
-import android.content.ComponentName
+import android.content.ClipData
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.core.content.IntentCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
+import coil.drawable.CrossfadeDrawable
 import coil.load
 import coil.request.CachePolicy
-import com.alexmercerind.audire.R
 import com.alexmercerind.audire.databinding.ActivityMusicBinding
 import com.alexmercerind.audire.mappers.toSearchQuery
+import com.alexmercerind.audire.mappers.toShareText
 import com.alexmercerind.audire.models.Music
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 class MusicActivity : AppCompatActivity() {
     companion object {
         const val MUSIC = "MUSIC"
-        const val SPOTIFY_PACKAGE_NAME = "com.spotify.music"
-        const val YOUTUBE_PACKAGE_NAME = "com.google.android.youtube"
     }
 
     private lateinit var music: Music
@@ -39,38 +48,45 @@ class MusicActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        music = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra(MUSIC) as Music
-        } else {
-            intent.getSerializableExtra(MUSIC, Music::class.java)!!
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            WindowInsetsCompat.CONSUMED
         }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.buttonGroup) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(
+                top = 16,
+                left = 16 + insets.left,
+                right = 16 + insets.right,
+                bottom = 16 + insets.bottom,
+            )
+            WindowInsetsCompat.CONSUMED
+        }
+
+        music = IntentCompat.getSerializableExtra(intent, MUSIC, Music::class.java)!!
 
         binding.titleTextView.text = music.title
-        binding.artistsTextView.text = music.artists
-
-        if (music.year != null) {
-            binding.yearChip.text = " ${music.year}"
+        if (music.artists.isNotEmpty()) {
+            binding.artistsTextView.text = music.artists
         } else {
-            binding.yearChip.visibility = View.GONE
+            binding.artistsMaterialCardView.visibility = View.GONE
         }
         if (music.album != null) {
-            binding.albumChip.text = " ${music.album}"
+            binding.albumTextView.text = music.album
         } else {
-            binding.albumChip.visibility = View.GONE
+            binding.albumMaterialCardView.visibility = View.GONE
+        }
+        if (music.label != null) {
+            binding.labelTextView.text = music.label
+        } else {
+            binding.labelMaterialCardView.visibility = View.GONE
         }
         if (music.year != null) {
-            binding.labelChip.text = " ${music.label}"
+            binding.yearTextView.text = music.year
         } else {
-            binding.labelChip.visibility = View.GONE
+            binding.yearMaterialCardView.visibility = View.GONE
         }
-        if (music.lyrics != null) {
-            binding.lyricsBodyTextView.text = music.lyrics
-        } else {
-            binding.lyricsTitleTextView.visibility = View.GONE
-            binding.lyricsBodyTextView.visibility = View.GONE
-        }
-
-
         binding.coverImageView.load(
             music.cover,
             ImageLoader.Builder(this)
@@ -81,46 +97,52 @@ class MusicActivity : AppCompatActivity() {
             crossfade(true)
         }
 
-        binding.searchMaterialButton.setOnClickListener {
-            try {
-                val uri = Uri.parse("https://www.duckduckgo.com/?q=${music.toSearchQuery()}")
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(intent)
-            } catch (e: Throwable) {
-                showFailureSnackbar()
-                e.printStackTrace()
-            }
+        lifecycleScope.launch {
+            delay(2000L)
+            binding.titleTextView.isSelected = true
         }
-        binding.spotifyMaterialButton.setOnClickListener {
-            try {
-                val intent = Intent(Intent.ACTION_MAIN).apply {
-                    action = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
-                    component =
-                        ComponentName(SPOTIFY_PACKAGE_NAME, "$SPOTIFY_PACKAGE_NAME.MainActivity")
+
+        binding.searchButton.setOnClickListener {
+            startActivity(
+                Intent(Intent.ACTION_WEB_SEARCH).apply {
                     putExtra(SearchManager.QUERY, music.toSearchQuery())
-                }
-                startActivity(intent)
-            } catch (e: Throwable) {
-                showFailureSnackbar()
-                e.printStackTrace()
-            }
+                })
         }
-        binding.youtubeMaterialButton.setOnClickListener {
-            try {
-                val intent = Intent(Intent.ACTION_SEARCH).apply {
-                    setPackage(YOUTUBE_PACKAGE_NAME)
-                    putExtra(SearchManager.QUERY, music.toSearchQuery())
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                startActivity(intent)
-            } catch (e: Throwable) {
-                showFailureSnackbar()
-                e.printStackTrace()
-            }
+        binding.shareButton.setOnClickListener {
+            startActivity(
+                Intent.createChooser(
+                    Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "image/jpeg"
+                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        clipData = ClipData.newRawUri(music.title, imageUri)
+                        putExtra(Intent.EXTRA_TEXT, music.toShareText())
+                        putExtra(Intent.EXTRA_STREAM, imageUri)
+                    },
+                    music.title
+                )
+            )
         }
     }
 
-    private fun showFailureSnackbar() {
-        Snackbar.make(binding.root, R.string.action_view_error, Snackbar.LENGTH_LONG).show()
+    private val imageUri: Uri? by lazy {
+        val drawable = binding.coverImageView.drawable as CrossfadeDrawable
+        val bitmap = drawable.end!!.toBitmap()
+        val cache = File(cacheDir, "images")
+        val image = File(cache, "cover.jpg")
+        cache.mkdirs()
+        return@lazy runCatching {
+            val stream = FileOutputStream(image)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream.close()
+            FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                image
+            )
+        }.getOrElse {
+            it.printStackTrace()
+            null
+        }
     }
 }

@@ -4,20 +4,22 @@
 
 **🎵 Identify music playing around you.**
 
-https://github.com/alexmercerind/audire/assets/28951144/3a6f22d9-899e-4a3e-980b-a869c1b61e50
+https://github.com/user-attachments/assets/2ea0e79a-65d5-4560-826b-b53a57fc9a51.mp4
 
 <br>
 
 <table>
   <tr>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/dacfa41a-646c-412e-8334-57969b1f15ec"></td>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/050994eb-11d3-4e1d-bb4b-53eea33855e9"></td>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/a4d0f8a0-2b99-4649-a97f-de2dd2e7de62"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/01.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/02.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg?raw=true"></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/0a492aef-c532-497e-baa8-14528f219cc0"></td>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/e241a9db-ae5a-4f1e-be1d-c3cf9640c57e"></td>
-    <td><img src="https://github.com/alexmercerind/audire/assets/28951144/8e8907fa-c617-4421-872e-33cd9bafa5e0"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/06.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/07.jpg?raw=true"></td>
+    <td><img src="https://github.com/alexmercerind/audire/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/08.jpg?raw=true"></td>
   </tr>
 </table>
 
