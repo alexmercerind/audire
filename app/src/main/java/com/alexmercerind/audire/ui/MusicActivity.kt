@@ -126,15 +126,15 @@ class MusicActivity : AppCompatActivity() {
     }
 
     private val imageUri: Uri? by lazy {
-        val drawable = binding.coverImageView.drawable as CrossfadeDrawable
-        val bitmap = drawable.end!!.toBitmap()
-        val cache = File(cacheDir, "images")
-        val image = File(cache, "cover.jpg")
-        cache.mkdirs()
         return@lazy runCatching {
-            val stream = FileOutputStream(image)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            stream.close()
+            val drawable = binding.coverImageView.drawable as CrossfadeDrawable
+            val bitmap = drawable.end!!.toBitmap()
+            val cache = File(cacheDir, "images")
+            val image = File(cache, "cover.jpg")
+            cache.mkdirs()
+            FileOutputStream(image).use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            }
             FileProvider.getUriForFile(
                 this,
                 "${applicationContext.packageName}.fileprovider",
