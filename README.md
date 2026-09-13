@@ -29,6 +29,10 @@ https://github.com/user-attachments/assets/2ea0e79a-65d5-4560-826b-b53a57fc9a51.
 - [Google Play Store](https://play.google.com/store/apps/details?id=com.alexmercerind.audire)
 - [IzzySoft](https://apt.izzysoft.de/fdroid/index/apk/com.alexmercerind.audire)
 
+## Verification
+
+Official APK Signing Certificate SHA-256 Fingerprint: `29:DA:10:94:31:62:D3:ED:38:6B:97:CF:F1:EF:BE:2F:9C:01:2C:9E:3A:5D:86:1F:8F:49:44:0B:16:C0:01:08`
+
 ## Building
 
 Refer to [CI](https://github.com/alexmercerind/audire/blob/main/.github/workflows/android.yml).
